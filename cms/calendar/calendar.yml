@@ -1,0 +1,294 @@
+openapi: '3.0.3'
+info:
+  title: Booking API in calendar feature For CMS
+  version: '1.0'
+servers:
+  - url: https://localhost:3000/api
+    description: Local server
+  
+paths:
+  /stores/{storeId}/availability:
+    get:
+      description: 'Get work hours for a store'
+      tags:
+        - calendar
+      parameters: 
+        - $ref: '#/components/parameters/storeId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workHoursOfDays'
+  /stores/{storeId}/timezone:
+    get:
+      description: 'Get timezone for a store'
+      tags:
+        - calendar
+      parameters:
+        - $ref: '#/components/parameters/storeId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timezone:
+                    type: string
+                    example: 'Asia/Kolkata'
+                    description: Timezone of the store
+  # v1: Add ID to teamMemberSmall schema (response)
+  /stores/{storeId}/teams:
+    get:
+      description: 'Get team members for a store'
+      tags:
+        - calendar
+      parameters:
+        - $ref: '#/components/parameters/storeId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/teamMemberSmall'
+  /stores/{storeId}/teams/{teamId}/availability:
+    get:
+      description: 'Get availability of a team member in a store'
+      tags:
+        - calendar
+      parameters:
+        - $ref: '#/components/parameters/storeId'
+        - $ref: '#/components/parameters/teamId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/workHoursOfDays'
+  # v1: Change response schema to array of services
+  /stores/{storeId}/teams/{teamId}/booked:
+    get:
+      description: 'Get booked services of a team member in a store in time range'
+      tags:
+        - calendar
+      parameters:
+        - $ref: '#/components/parameters/storeId'
+        - $ref: '#/components/parameters/teamId'
+        - $ref: '#/components/parameters/startTime'
+        - $ref: '#/components/parameters/endTime'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/service'
+  #v1
+  /stores/{storeId}/book:
+    post:
+      description: 'Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)'
+      tags:
+        - calendar
+      parameters:
+        - $ref: '#/components/parameters/storeId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - teamId
+                - serviceId
+                - start
+                - end
+              properties:
+                teamId:
+                  $ref: '#/components/schemas/id'
+                serviceId:
+                  $ref: '#/components/schemas/id'
+                start:
+                  type: string
+                  format: date-time
+                  example: '2021-01-01T09:00:00Z'
+                  description: Start time of the service
+                end:
+                  type: string
+                  format: date-time
+                  example: '2021-01-01T09:30:00Z'
+                  description: End time of the service
+                comment:
+                  type: string
+                  example: 'Please bring your own mask'
+                  description: Comment for the service
+                customer:
+                  oneOf:
+                    - $ref: '#/components/schemas/id'
+                    - $ref: '#/components/schemas/anonymousCustomer'
+      responses:
+        '201':
+          description: Created
+
+
+components:
+  schemas:
+    id:
+      type: string
+      format: uuid
+      example: '123e4567-e89b-12d3-a456-426614174000'
+      description: Id of the entity
+    timeRange:
+      type: object
+      properties:
+        start:
+          type: string
+          format: time
+          example: '09:00'
+          description: Start time
+        end:
+          type: string
+          format: time
+          example: '18:00'
+          description: End time
+    workHoursOfDays:
+      type: object
+      properties:
+        monday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+        tuesday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+        wednesday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+        thursday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+        friday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+        saturday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+        sunday:
+          type: array
+          items:
+            $ref: '#/components/schemas/timeRange'
+    teamMemberSmall:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/id'
+        name:
+          type: string
+          example: 'John Doe'
+          description: Name of the team member
+        avatar:
+          type: string
+          example: 'https://example.com/avatar.jpg'
+          description: Avatar of the team member
+    service:
+      type: object
+      required:
+        - id
+        - name
+        - start
+        - end
+      properties:
+        id: 
+          type: string
+          format: uuid
+          example: '123e4567-e89b-12d3-a456-426614174000'
+          description: Id of the service
+        name:
+          type: string
+          example: 'Haircut'
+          description: Name of the service
+        start:
+          type: string
+          format: date-time
+          example: '2021-01-01T09:00:00Z'
+          description: Start time of the service
+        end:
+          type: string
+          format: date-time
+          example: '2021-01-01T09:30:00Z'
+          description: End time of the service
+    anonymousCustomer:
+      type: object
+      required:
+        - name
+        - phone
+      properties:
+        name:
+          type: string
+          example: 'John Doe'
+        phone:
+          type: string
+          example: '1234567890'
+        email:
+          type: string
+          example: 'abc@gmail.com'
+        address:
+          type: string
+          example: '123, Example Street, City, Country'
+        avatar:
+          type: string
+          example: 'https://example.com/avatar.jpg'
+      example:
+        name: 'John Doe'
+        phone: '1234567890'
+        email: 'johndoe@gmail.com'
+        address: '123, Example Street, City, Country'
+        avatar: 'https://example.com/avatar.jpg'
+
+  parameters:
+    storeId:
+      name: storeId
+      in: path
+      required: true
+      description: 'Id of the store'
+      schema:
+        type: integer
+        example: 1
+    teamId:
+      name: teamId
+      in: path
+      required: true
+      description: 'Id of a team member'
+      schema:
+        type: integer
+        example: 1
+    startTime:
+      name: startTime
+      in: query
+      required: true
+      description: 'Start of the time range in date time'
+      schema:
+        type: string
+        format: date-time
+        example: '2021-01-01T09:00:00Z'
+    endTime:
+      name: endTime
+      in: query
+      required: true
+      description: 'End of the time range in date time'
+      schema:
+        type: string
+        format: date-time
+        example: '2021-01-01T18:00:00Z'

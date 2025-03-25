@@ -1,0 +1,10 @@
+*************************************************************
+v1 - 25/03:
+- /stores/{storeId}/teams:
+	- Add id field to response
+- /stores/{storeId}/teams/{teamId}/booked:
+	- Change response schema to array of services
+- Add new endpoint(s):
+	- POST: /stores/{storeId}/book:
+*************************************************************
+	
