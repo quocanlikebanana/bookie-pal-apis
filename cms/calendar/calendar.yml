@@ -9,11 +9,13 @@ servers:
 paths:
   /stores/{storeId}/availability:
     get:
-      description: 'Get work hours for a store'
+      description: 'Get availability (work hours) for a store in a from start time to end time'
       tags:
         - calendar
       parameters: 
         - $ref: '#/components/parameters/storeId'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
       responses:
         '200':
           description: OK
@@ -21,6 +23,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/workHoursOfDays'
+              example:
+                - dayOfWeek: 0
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 1
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 2
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 3
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 4
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
   /stores/{storeId}/timezone:
     get:
       description: 'Get timezone for a store'
@@ -59,12 +102,14 @@ paths:
                   $ref: '#/components/schemas/teamMemberSmall'
   /stores/{storeId}/teams/{teamId}/availability:
     get:
-      description: 'Get availability of a team member in a store'
+      description: 'Get availability of a team member in a store in time range'
       tags:
         - calendar
       parameters:
         - $ref: '#/components/parameters/storeId'
         - $ref: '#/components/parameters/teamId'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
       responses:
         '200':
           description: OK
@@ -72,6 +117,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/workHoursOfDays'
+              example:
+                - dayOfWeek: 0
+                  workHours:
+                  - start:
+                      hour: 9
+                      minute: 0
+                    end:
+                      hour: 12
+                      minute: 0
+                  - start:
+                      hour: 13
+                      minute: 0
+                    end:
+                      hour: 18
+                      minute: 0
+                - dayOfWeek: 1
+                  workHours:
+                  - start:
+                      hour: 9
+                      minute: 0
+                    end:
+                      hour: 12
+                      minute: 0
+                - dayOfWeek: 2
+                  workHours:
+                  - start:
+                      hour: 9
+                      minute: 0
+                    end:
+                      hour: 18
+                      minute: 0
+                - dayOfWeek: 3
+                  workHours:
+                  - start:
+                      hour: 9
+                      minute: 0
+                    end:
+                      hour: 18
+                      minute: 0
+                - dayOfWeek: 4
+                  workHours:
+                  - start:
+                      hour: 9
+                      minute: 0
+                    end:
+                      hour: 18
+                      minute: 0
   # v1: Change response schema to array of services
   /stores/{storeId}/teams/{teamId}/booked:
     get:
@@ -81,8 +173,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/storeId'
         - $ref: '#/components/parameters/teamId'
-        - $ref: '#/components/parameters/startTime'
-        - $ref: '#/components/parameters/endTime'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
       responses:
         '200':
           description: OK
@@ -137,7 +229,6 @@ paths:
         '201':
           description: Created
 
-
 components:
   schemas:
     id:
@@ -145,52 +236,61 @@ components:
       format: uuid
       example: '123e4567-e89b-12d3-a456-426614174000'
       description: Id of the entity
+    time:
+      type: object
+      properties:
+        hour:
+          type: integer
+          example: 9
+          description: Hour of the time (0-23)
+          maximum: 23
+          minimum: 0
+        minute:
+          type: integer
+          example: 0
+          description: Minute of the time
+          maximum: 59
+          minimum: 0
+      required:
+        - hour
+        - minute
     timeRange:
       type: object
+      required:
+        - start
+        - end
       properties:
         start:
-          type: string
-          format: time
-          example: '09:00'
+          $ref: '#/components/schemas/time'
           description: Start time
         end:
-          type: string
-          format: time
-          example: '18:00'
+          $ref: '#/components/schemas/time'
           description: End time
     workHoursOfDays:
-      type: object
-      properties:
-        monday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
-        tuesday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
-        wednesday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
-        thursday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
-        friday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
-        saturday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
-        sunday:
-          type: array
-          items:
-            $ref: '#/components/schemas/timeRange'
+      type: array
+      items :
+        type: object
+        required:
+          - dayOfWeek
+          - workHours
+        properties:
+          dayOfWeek:
+            type: integer
+            example: 0
+            description: Day of the week in number (0-6), 0 is Monday
+            maximum: 6
+            minimum: 0
+          workHours:
+            type: array
+            items:
+              $ref: '#/components/schemas/timeRange'
+            description: Work hours of the day of the week
     teamMemberSmall:
       type: object
+      required:
+        - id
+        - name
+        - role
       properties:
         id:
           $ref: '#/components/schemas/id'
@@ -202,6 +302,14 @@ components:
           type: string
           example: 'https://example.com/avatar.jpg'
           description: Avatar of the team member
+        role:
+          type: string
+          enum:
+            - admin
+            - manager
+            - employee
+          example: 'admin'
+          description: Role of the team member
     service:
       type: object
       required:
@@ -264,18 +372,16 @@ components:
       required: true
       description: 'Id of the store'
       schema:
-        type: integer
-        example: 1
+        $ref: '#/components/schemas/id'
     teamId:
       name: teamId
       in: path
       required: true
       description: 'Id of a team member'
       schema:
-        type: integer
-        example: 1
-    startTime:
-      name: startTime
+        $ref: '#/components/schemas/id'
+    start:
+      name: start
       in: query
       required: true
       description: 'Start of the time range in date time'
@@ -283,8 +389,8 @@ components:
         type: string
         format: date-time
         example: '2021-01-01T09:00:00Z'
-    endTime:
-      name: endTime
+    end:
+      name: end
       in: query
       required: true
       description: 'End of the time range in date time'
