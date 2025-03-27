@@ -1,4 +1,8 @@
 *************************************************************
+v3 - 27/03
+- Add:
+	- GET: /stores/{storeId}/booked (all services booked in the store)
+*************************************************************
 v2 - 26/03:
 - Changes data structure of workHour response, use array instead of object
 - Use Time data structure instead of string in TimeRange
@@ -12,5 +16,5 @@ v1 - 25/03:
 - /stores/{storeId}/teams/{teamId}/booked:
 	- Change response schema to array of services
 - Add new endpoint(s):
-	- POST: /stores/{storeId}/book:
+	- POST: /stores/{storeId}/book
 *************************************************************

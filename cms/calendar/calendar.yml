@@ -64,6 +64,24 @@ paths:
                       end:
                         hour: 18
                         minute: 0
+  /stores/{storeId}/booked:
+    get:
+      description: 'Get booked services of a store in a time range (all team members)'
+      tags:
+        - calendar
+      parameters:
+        - $ref: '#/components/parameters/storeId'
+        - $ref: '#/components/parameters/start'
+        - $ref: '#/components/parameters/end'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/service'
   /stores/{storeId}/timezone:
     get:
       description: 'Get timezone for a store'
@@ -83,7 +101,6 @@ paths:
                     type: string
                     example: 'Asia/Kolkata'
                     description: Timezone of the store
-  # v1: Add ID to teamMemberSmall schema (response)
   /stores/{storeId}/teams:
     get:
       description: 'Get team members for a store'
@@ -164,7 +181,6 @@ paths:
                     end:
                       hour: 18
                       minute: 0
-  # v1: Change response schema to array of services
   /stores/{storeId}/teams/{teamId}/booked:
     get:
       description: 'Get booked services of a team member in a store in time range'
@@ -184,7 +200,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/service'
-  #v1
   /stores/{storeId}/book:
     post:
       description: 'Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)'
