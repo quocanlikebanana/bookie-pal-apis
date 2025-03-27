@@ -1,28 +1,28 @@
-openapi: '3.0.3'
+openapi: "3.0.3"
 info:
   title: Booking API in calendar feature For CMS
-  version: '1.0'
+  version: "1.0"
 servers:
   - url: https://localhost:3000/api
     description: Local server
-  
+
 paths:
   /stores/{storeId}/availability:
     get:
-      description: 'Get availability (work hours) for a store in a from start time to end time'
+      description: "Get availability (work hours) for a store in a from start time to end time"
       tags:
         - calendar
-      parameters: 
-        - $ref: '#/components/parameters/storeId'
-        - $ref: '#/components/parameters/start'
-        - $ref: '#/components/parameters/end'
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/workHoursOfDays'
+                $ref: "#/components/schemas/workHoursOfDays"
               example:
                 - dayOfWeek: 0
                   workHours:
@@ -66,31 +66,31 @@ paths:
                         minute: 0
   /stores/{storeId}/booked:
     get:
-      description: 'Get booked services of a store in a time range (all team members)'
+      description: "Get booked services of a store in a time range (all team members)"
       tags:
         - calendar
       parameters:
-        - $ref: '#/components/parameters/storeId'
-        - $ref: '#/components/parameters/start'
-        - $ref: '#/components/parameters/end'
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/service'
+                  $ref: "#/components/schemas/book"
   /stores/{storeId}/timezone:
     get:
-      description: 'Get timezone for a store'
+      description: "Get timezone for a store"
       tags:
         - calendar
       parameters:
-        - $ref: '#/components/parameters/storeId'
+        - $ref: "#/components/parameters/storeId"
       responses:
-        '200':
+        "200":
           description: OK
           content:
             application/json:
@@ -99,114 +99,15 @@ paths:
                 properties:
                   timezone:
                     type: string
-                    example: 'Asia/Kolkata'
+                    example: "Asia/Kolkata"
                     description: Timezone of the store
-  /stores/{storeId}/teams:
-    get:
-      description: 'Get team members for a store'
-      tags:
-        - calendar
-      parameters:
-        - $ref: '#/components/parameters/storeId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/teamMemberSmall'
-  /stores/{storeId}/teams/{teamId}/availability:
-    get:
-      description: 'Get availability of a team member in a store in time range'
-      tags:
-        - calendar
-      parameters:
-        - $ref: '#/components/parameters/storeId'
-        - $ref: '#/components/parameters/teamId'
-        - $ref: '#/components/parameters/start'
-        - $ref: '#/components/parameters/end'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/workHoursOfDays'
-              example:
-                - dayOfWeek: 0
-                  workHours:
-                  - start:
-                      hour: 9
-                      minute: 0
-                    end:
-                      hour: 12
-                      minute: 0
-                  - start:
-                      hour: 13
-                      minute: 0
-                    end:
-                      hour: 18
-                      minute: 0
-                - dayOfWeek: 1
-                  workHours:
-                  - start:
-                      hour: 9
-                      minute: 0
-                    end:
-                      hour: 12
-                      minute: 0
-                - dayOfWeek: 2
-                  workHours:
-                  - start:
-                      hour: 9
-                      minute: 0
-                    end:
-                      hour: 18
-                      minute: 0
-                - dayOfWeek: 3
-                  workHours:
-                  - start:
-                      hour: 9
-                      minute: 0
-                    end:
-                      hour: 18
-                      minute: 0
-                - dayOfWeek: 4
-                  workHours:
-                  - start:
-                      hour: 9
-                      minute: 0
-                    end:
-                      hour: 18
-                      minute: 0
-  /stores/{storeId}/teams/{teamId}/booked:
-    get:
-      description: 'Get booked services of a team member in a store in time range'
-      tags:
-        - calendar
-      parameters:
-        - $ref: '#/components/parameters/storeId'
-        - $ref: '#/components/parameters/teamId'
-        - $ref: '#/components/parameters/start'
-        - $ref: '#/components/parameters/end'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/service'
   /stores/{storeId}/book:
     post:
-      description: 'Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)'
+      description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
       tags:
         - calendar
       parameters:
-        - $ref: '#/components/parameters/storeId'
+        - $ref: "#/components/parameters/storeId"
       requestBody:
         content:
           application/json:
@@ -219,37 +120,170 @@ paths:
                 - end
               properties:
                 teamId:
-                  $ref: '#/components/schemas/id'
+                  $ref: "#/components/schemas/id"
                 serviceId:
-                  $ref: '#/components/schemas/id'
+                  $ref: "#/components/schemas/id"
                 start:
                   type: string
                   format: date-time
-                  example: '2021-01-01T09:00:00Z'
+                  example: "2021-01-01T09:00:00Z"
                   description: Start time of the service
                 end:
                   type: string
                   format: date-time
-                  example: '2021-01-01T09:30:00Z'
+                  example: "2021-01-01T09:30:00Z"
                   description: End time of the service
                 comment:
                   type: string
-                  example: 'Please bring your own mask'
+                  example: "Please bring your own mask"
                   description: Comment for the service
                 customer:
                   oneOf:
-                    - $ref: '#/components/schemas/id'
-                    - $ref: '#/components/schemas/anonymousCustomer'
+                    - $ref: "#/components/schemas/id"
+                    - $ref: "#/components/schemas/anonymousCustomer"
       responses:
-        '201':
+        "201":
           description: Created
+  /stores/{storeId}/services:
+    get:
+      description: "Get services of a store."
+      tags:
+        - calendar
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/service"
+
+  /stores/{storeId}/teams:
+    get:
+      description: "Get team members for a store"
+      tags:
+        - calendar
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/teamMemberSmall"
+  /stores/{storeId}/teams/{teamId}/availability:
+    get:
+      description: "Get availability of a team member in a store in time range"
+      tags:
+        - calendar
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/teamId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/workHoursOfDays"
+              example:
+                - dayOfWeek: 0
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 12
+                        minute: 0
+                    - start:
+                        hour: 13
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 1
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 12
+                        minute: 0
+                - dayOfWeek: 2
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 3
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+                - dayOfWeek: 4
+                  workHours:
+                    - start:
+                        hour: 9
+                        minute: 0
+                      end:
+                        hour: 18
+                        minute: 0
+  /stores/{storeId}/teams/{teamId}/booked:
+    get:
+      description: "Get booked services of a team member in a store in time range"
+      tags:
+        - calendar
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/teamId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/book"
+  /stores/{storeId}/teams/{teamId}/services:
+    get:
+      description: "Get services of a team member in a store"
+      tags:
+        - calendar
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/service"
 
 components:
   schemas:
     id:
       type: string
       format: uuid
-      example: '123e4567-e89b-12d3-a456-426614174000'
+      example: "123e4567-e89b-12d3-a456-426614174000"
       description: Id of the entity
     time:
       type: object
@@ -276,14 +310,14 @@ components:
         - end
       properties:
         start:
-          $ref: '#/components/schemas/time'
+          $ref: "#/components/schemas/time"
           description: Start time
         end:
-          $ref: '#/components/schemas/time'
+          $ref: "#/components/schemas/time"
           description: End time
     workHoursOfDays:
       type: array
-      items :
+      items:
         type: object
         required:
           - dayOfWeek
@@ -298,7 +332,7 @@ components:
           workHours:
             type: array
             items:
-              $ref: '#/components/schemas/timeRange'
+              $ref: "#/components/schemas/timeRange"
             description: Work hours of the day of the week
     teamMemberSmall:
       type: object
@@ -308,14 +342,14 @@ components:
         - role
       properties:
         id:
-          $ref: '#/components/schemas/id'
+          $ref: "#/components/schemas/id"
         name:
           type: string
-          example: 'John Doe'
+          example: "John Doe"
           description: Name of the team member
         avatar:
           type: string
-          example: 'https://example.com/avatar.jpg'
+          example: "https://example.com/avatar.jpg"
           description: Avatar of the team member
         role:
           type: string
@@ -323,35 +357,68 @@ components:
             - admin
             - manager
             - employee
-          example: 'admin'
+          example: "admin"
           description: Role of the team member
     service:
       type: object
       required:
         - id
         - name
-        - start
-        - end
+        - duration
+        - members
       properties:
-        id: 
-          type: string
-          format: uuid
-          example: '123e4567-e89b-12d3-a456-426614174000'
-          description: Id of the service
+        id:
+          $ref: "#/components/schemas/id"
         name:
           type: string
-          example: 'Haircut'
+          example: "Haircut"
           description: Name of the service
+        duration:
+          type: integer
+          example: 30
+          description: Duration of the service in minutes.
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/teamMemberSmall"
+          description: Team members who can provide the service
+    book:
+      type: object
+      required:
+        - id
+        - service
+        - customer
+        - start
+        - end
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          description: Id of the service
+        service:
+          $ref: "#/components/schemas/service"
+        customer:
+          oneOf:
+            - $ref: "#/components/schemas/customer"
+            - $ref: "#/components/schemas/anonymousCustomer"
         start:
           type: string
           format: date-time
-          example: '2021-01-01T09:00:00Z'
+          example: "2021-01-01T09:00:00Z"
           description: Start time of the service
         end:
           type: string
           format: date-time
-          example: '2021-01-01T09:30:00Z'
+          example: "2021-01-01T09:30:00Z"
           description: End time of the service
+        comment:
+          type: string
+          example: "Please bring your own mask"
+          description: Comment for the service
+        status:
+          $ref: "#/components/schemas/bookingStatus"
     anonymousCustomer:
       type: object
       required:
@@ -360,56 +427,75 @@ components:
       properties:
         name:
           type: string
-          example: 'John Doe'
+          example: "John Doe"
         phone:
           type: string
-          example: '1234567890'
+          example: "1234567890"
         email:
           type: string
-          example: 'abc@gmail.com'
+          example: "abc@gmail.com"
         address:
           type: string
-          example: '123, Example Street, City, Country'
+          example: "123, Example Street, City, Country"
         avatar:
           type: string
-          example: 'https://example.com/avatar.jpg'
+          example: "https://example.com/avatar.jpg"
       example:
-        name: 'John Doe'
-        phone: '1234567890'
-        email: 'johndoe@gmail.com'
-        address: '123, Example Street, City, Country'
-        avatar: 'https://example.com/avatar.jpg'
+        name: "John Doe"
+        phone: "1234567890"
+        email: "johndoe@gmail.com"
+        address: "123, Example Street, City, Country"
+        avatar: "https://example.com/avatar.jpg"
+    customer:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/anonymousCustomer"
+        - type: object
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+          required:
+            - id
+    bookingStatus:
+      type: string
+      enum:
+        - new
+        - ready
+        - denined
+        - done
+      example: "new"
+      description: Status of the booking.
 
   parameters:
     storeId:
       name: storeId
       in: path
       required: true
-      description: 'Id of the store'
+      description: "Id of the store"
       schema:
-        $ref: '#/components/schemas/id'
+        $ref: "#/components/schemas/id"
     teamId:
       name: teamId
       in: path
       required: true
-      description: 'Id of a team member'
+      description: "Id of a team member"
       schema:
-        $ref: '#/components/schemas/id'
+        $ref: "#/components/schemas/id"
     start:
       name: start
       in: query
       required: true
-      description: 'Start of the time range in date time'
+      description: "Start of the time range in date time"
       schema:
         type: string
         format: date-time
-        example: '2021-01-01T09:00:00Z'
+        example: "2021-01-01T09:00:00Z"
     end:
       name: end
       in: query
       required: true
-      description: 'End of the time range in date time'
+      description: "End of the time range in date time"
       schema:
         type: string
         format: date-time
-        example: '2021-01-01T18:00:00Z'
+        example: "2021-01-01T18:00:00Z"

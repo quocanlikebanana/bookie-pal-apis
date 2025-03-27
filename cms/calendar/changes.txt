@@ -2,6 +2,9 @@
 v3 - 27/03
 - Add:
 	- GET: /stores/{storeId}/booked (all services booked in the store)
+	- GET: /stores/{storeId}/services
+	- GET: /stores/{storeId}/teams/{teamId}/services
+- Change (the booked endpoint(s) response) service => book and some of its properties, to distinct with service
 *************************************************************
 v2 - 26/03:
 - Changes data structure of workHour response, use array instead of object
