@@ -11,7 +11,7 @@ paths:
     get:
       description: "Get availability (work hours) for a store in a from start time to end time"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/start"
@@ -68,7 +68,7 @@ paths:
     get:
       description: "Get booked services of a store in a time range (all team members)"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/start"
@@ -86,7 +86,7 @@ paths:
     get:
       description: "Get timezone for a store"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
       responses:
@@ -105,7 +105,7 @@ paths:
     post:
       description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
       requestBody:
@@ -143,7 +143,7 @@ paths:
     get:
       description: "Get services of a store."
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
       responses:
@@ -159,7 +159,7 @@ paths:
     get:
       description: "Get customers of a store."
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
       responses:
@@ -171,12 +171,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/customer"
-
   /stores/{storeId}/teams:
     get:
       description: "Get team members for a store"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
       responses:
@@ -192,7 +191,7 @@ paths:
     get:
       description: "Get availability of a team member in a store in time range"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/teamId"
@@ -256,7 +255,7 @@ paths:
     get:
       description: "Get booked services of a team member in a store in time range"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/teamId"
@@ -275,7 +274,7 @@ paths:
     get:
       description: "Get services of a team member in a store"
       tags:
-        - calendar
+        - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/teamId"
@@ -288,6 +287,28 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/service"
+
+  /services/{serviceId}/teams:
+    get:
+      description: "Get team members for a service"
+      tags:
+        - Service
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          description: "Id of the service"
+          schema:
+            $ref: "#/components/schemas/id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/teamMemberSmall"
 
 components:
   schemas:
@@ -380,8 +401,10 @@ components:
       required:
         - id
         - name
+        - description
         - duration
         - members
+        - category
       properties:
         id:
           $ref: "#/components/schemas/id"
@@ -389,6 +412,10 @@ components:
           type: string
           example: "Haircut"
           description: Name of the service
+        description:
+          type: string
+          example: "A simple haircut service"
+          description: Description of the service
         duration:
           type: integer
           example: 30
@@ -399,6 +426,10 @@ components:
           items:
             $ref: "#/components/schemas/teamMemberSmall"
           description: Team members who can provide the service
+        category:
+          type: string
+          example: "Hair"
+          description: Category of the service
     book:
       type: object
       required:
