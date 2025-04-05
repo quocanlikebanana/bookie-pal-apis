@@ -5,8 +5,48 @@ info:
 servers:
   - url: https://localhost:3000/api
     description: Local server
+tags:
+  - name: Store
+    description: Store related operations
+  - name: Service
+    description: Service related operations
+  - name: Industry
+    description: Industry related operations
+  - name: Team
+    description: Team related operations
 
 paths:
+  /stores:
+    get:
+      description: "Get all stores"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/store"
+  /stores/{storeId}:
+    get:
+      description: "Get a store by id"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/store"
   /stores/{storeId}/availability:
     get:
       description: "Get availability (work hours) for a store in a from start time to end time"
@@ -82,25 +122,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/book"
-  /stores/{storeId}/timezone:
-    get:
-      description: "Get timezone for a store"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  timezone:
-                    type: string
-                    example: "Asia/Kolkata"
-                    description: Timezone of the store
   /stores/{storeId}/book:
     post:
       description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
@@ -187,13 +208,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
-  /stores/{storeId}/teams/{teamId}/availability:
+
+  /teams/{teamId}/availability:
     get:
       description: "Get availability of a team member in a store in time range"
       tags:
-        - Store
+        - Team
       parameters:
-        - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/teamId"
         - $ref: "#/components/parameters/start"
         - $ref: "#/components/parameters/end"
@@ -251,13 +272,12 @@ paths:
                       end:
                         hour: 18
                         minute: 0
-  /stores/{storeId}/teams/{teamId}/booked:
+  /teams/{teamId}/booked:
     get:
       description: "Get booked services of a team member in a store in time range"
       tags:
-        - Store
+        - Team
       parameters:
-        - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/teamId"
         - $ref: "#/components/parameters/start"
         - $ref: "#/components/parameters/end"
@@ -270,13 +290,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/book"
-  /stores/{storeId}/teams/{teamId}/services:
+  /teams/{teamId}/services:
     get:
       description: "Get services of a team member in a store"
       tags:
-        - Store
+        - Team
       parameters:
-        - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/teamId"
       responses:
         "200":
@@ -309,6 +328,23 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
+
+  /industries:
+    get:
+      description: "Get all industries"
+      tags:
+        - Industry
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "Beauty"
+                  description: Name of the industry
 
 components:
   schemas:
@@ -514,6 +550,47 @@ components:
         - done
       example: "new"
       description: Status of the booking.
+    store:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - address
+        - industry
+        - phone
+        - timezone
+        - workHours
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+          example: "My Store"
+          description: Name of the store
+        description:
+          type: string
+          example: "A simple store"
+          description: Description of the store
+        address:
+          type: string
+          example: "123, Example Street, City, Country"
+          description: Address of the store
+        industry:
+          type: string
+          example: "Beauty"
+          description: Industry of the store
+        phone:
+          type: string
+          example: "+1234567890"
+          description: Phone number of the store
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+          description: Timezone of the store
+        workHours:
+          $ref: "#/components/schemas/workHoursOfDays"
+          description: Work hours of the store
 
   parameters:
     storeId:
@@ -548,3 +625,22 @@ components:
         type: string
         format: date-time
         example: "2021-01-01T18:00:00Z"
+    page:
+      name: page
+      in: query
+      required: false
+      description: "Page number for pagination"
+      schema:
+        type: integer
+        example: 1
+        minimum: 1
+    limit:
+      name: limit
+      in: query
+      required: false
+      description: "Limit number of items per page"
+      schema:
+        type: integer
+        example: 10
+        minimum: 1
+        maximum: 1000
