@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
   title: Booking API in calendar feature For CMS
-  version: "1.0"
+  version: "1.0.1"
 servers:
   - url: https://localhost:3000/api
     description: Local server
@@ -62,7 +62,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/workHoursOfDays"
+                type: array
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/timeRange"
               example:
                 - dayOfWeek: 0
                   workHours:
@@ -224,7 +228,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/workHoursOfDays"
+                type: array
+                items:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/timeRange"
               example:
                 - dayOfWeek: 0
                   workHours:
@@ -373,6 +381,7 @@ components:
         - minute
     timeRange:
       type: object
+      description: Time range in a day. From start to end time (hour and minute).
       required:
         - start
         - end
@@ -388,25 +397,6 @@ components:
       format: date-time
       example: "2021-01-01T09:00:00Z"
       description: Date time in ISO 8601 format
-    workHoursOfDays:
-      type: array
-      items:
-        type: object
-        required:
-          - dayOfWeek
-          - workHours
-        properties:
-          dayOfWeek:
-            type: integer
-            example: 0
-            description: Day of the week in number (0-6), 0 is Monday
-            maximum: 6
-            minimum: 0
-          workHours:
-            type: array
-            items:
-              $ref: "#/components/schemas/timeRange"
-            description: Work hours of the day of the week
     teamMemberSmall:
       type: object
       required:
@@ -589,7 +579,11 @@ components:
           example: "Asia/Kolkata"
           description: Timezone of the store
         workHours:
-          $ref: "#/components/schemas/workHoursOfDays"
+          type: array
+          items:
+            type: array
+            items:
+              $ref: "#/components/schemas/timeRange"
           description: Work hours of the store
 
   parameters:
