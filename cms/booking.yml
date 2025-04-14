@@ -3,6 +3,8 @@ info:
   title: Booking API in calendar feature For CMS
   version: "1.0.1"
 servers:
+  - url: http://35.198.194.208:30015/booking
+    description: Production server
   - url: https://localhost:3000/api
     description: Local server
 tags:
@@ -30,9 +32,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/store"
+                type: object
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+                  stores:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/store"
   /stores/{storeId}:
     get:
       description: "Get a store by id"
@@ -113,9 +120,7 @@ paths:
                   example: "Please bring your own mask"
                   description: Comment for the service
                 customer:
-                  oneOf:
-                    - $ref: "#/components/schemas/id"
-                    - $ref: "#/components/schemas/anonymousCustomer"
+                  $ref: "#/components/schemas/createCustomer"
       responses:
         "201":
           description: Created
@@ -498,10 +503,7 @@ components:
         service:
           $ref: "#/components/schemas/service"
         customer:
-          anyOf:
-            - $ref: "#/components/schemas/id"
-              description: Id of the customer
-            - $ref: "#/components/schemas/anonymousCustomer"
+          $ref: "#/components/schemas/customer"
         start:
           type: string
           format: date-time
@@ -518,12 +520,15 @@ components:
           description: Comment for the service
         status:
           $ref: "#/components/schemas/bookingStatus"
-    anonymousCustomer:
+    createCustomer:
       type: object
       required:
         - name
         - phone
       properties:
+        accountId:
+          $ref: "#/components/schemas/id"
+          description: Id of the customer account. This is optional and can be null if the customer is anomynous.
         name:
           type: string
           example: "John Doe"
@@ -539,22 +544,15 @@ components:
         avatar:
           type: string
           example: "https://example.com/avatar.jpg"
-      example:
-        name: "John Doe"
-        phone: "1234567890"
-        email: "johndoe@gmail.com"
-        address: "123, Example Street, City, Country"
-        avatar: "https://example.com/avatar.jpg"
     customer:
-      type: object
       allOf:
-        - $ref: "#/components/schemas/anonymousCustomer"
+        - $ref: "#/components/schemas/createCustomer"
         - type: object
           properties:
             id:
               $ref: "#/components/schemas/id"
-          required:
-            - id
+              description: Id of the customer in Booking domain (not the account id).
+
     bookingStatus:
       type: string
       enum:
@@ -604,6 +602,30 @@ components:
           description: Timezone of the store
         workHours:
           $ref: "#/components/schemas/workHoursInWeek"
+    pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+          description: Current page number, starts from 1
+          minimum: 1
+        limit:
+          type: integer
+          example: 10
+          description: Limit number of items per page, starts from 1
+          minimum: 1
+          maximum: 1000
+        totalItems:
+          type: integer
+          example: 100
+          description: Total number of items in the database
+          minimum: 0
+        totalPages:
+          type: integer
+          example: 10
+          description: Total number of pages, starts from 1
+          minimum: 1
 
   parameters:
     storeId:
