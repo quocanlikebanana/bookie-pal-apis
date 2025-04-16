@@ -33,6 +33,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - pagination
+                  - stores
                 properties:
                   pagination:
                     $ref: "#/components/schemas/pagination"
