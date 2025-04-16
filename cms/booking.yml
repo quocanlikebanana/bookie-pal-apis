@@ -40,6 +40,20 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/store"
+  /stores/self:
+    get:
+      description: "Get the stores created of admin"
+      tags:
+        - Store
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/store"
   /stores/{storeId}:
     get:
       description: "Get a store by id"
