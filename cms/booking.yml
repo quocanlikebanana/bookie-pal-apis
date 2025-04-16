@@ -565,6 +565,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/createCustomer"
         - type: object
+          required:
+            - id
           properties:
             id:
               $ref: "#/components/schemas/id"
