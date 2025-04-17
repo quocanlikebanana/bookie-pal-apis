@@ -18,6 +18,33 @@ tags:
     description: Team related operations
 
 paths:
+  /account/{accountId}/stores:
+    get:
+      description: "Get all stores of an account "
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/accountId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - stores
+                properties:
+                  pagination:
+                    $ref: "#/components/schemas/pagination"
+                  stores:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/store"
+
   /stores:
     get:
       description: "Get all stores"
@@ -43,20 +70,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/store"
-  /stores/self:
-    get:
-      description: "Get the stores created of admin"
-      tags:
-        - Store
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/store"
   /stores/{storeId}:
     get:
       description: "Get a store by id"
@@ -241,6 +254,50 @@ paths:
                 items:
                   $ref: "#/components/schemas/service"
 
+  /services:
+    post:
+      description: "Create a service"
+      tags:
+        - Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createService"
+      responses:
+        "201":
+          description: Created
+    put:
+      description: "Update a service"
+      tags:
+        - Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/service"
+      responses:
+        "200":
+          description: OK
+  /services/{serviceId}:
+    get:
+      description: "Get a service by id"
+      tags:
+        - Service
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          description: "Id of the service"
+          schema:
+            $ref: "#/components/schemas/id"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/service"
   /services/{serviceId}/teams:
     get:
       description: "Get team members for a service"
@@ -468,18 +525,15 @@ components:
             - employee
           example: "admin"
           description: Role of the team member
-    service:
+    createService:
       type: object
       required:
-        - id
         - name
         - description
         - duration
         - members
         - category
       properties:
-        id:
-          $ref: "#/components/schemas/id"
         name:
           type: string
           example: "Haircut"
@@ -502,6 +556,16 @@ components:
           type: string
           example: "Hair"
           description: Category of the service
+    service:
+      allOf:
+        - $ref: "#/components/schemas/createService"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+              description: Id of the service in Booking domain.
     book:
       type: object
       required:
@@ -647,6 +711,13 @@ components:
           minimum: 1
 
   parameters:
+    accountId:
+      name: accountId
+      in: path
+      required: true
+      description: "Id of the account"
+      schema:
+        $ref: "#/components/schemas/id"
     storeId:
       name: storeId
       in: path
