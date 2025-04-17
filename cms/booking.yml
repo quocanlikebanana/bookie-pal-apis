@@ -279,6 +279,18 @@ paths:
       responses:
         "200":
           description: OK
+    delete:
+      description: "Delete a service"
+      tags:
+        - Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/id"
+      responses:
+        "204":
+          description: No Content
   /services/{serviceId}:
     get:
       description: "Get a service by id"
