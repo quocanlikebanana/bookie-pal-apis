@@ -29,16 +29,7 @@ paths:
                   type: string
       responses:
         "200":
-          description: Successful login
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    $ref: "#/components/schemas/UserAuth"
-                  token:
-                    $ref: "#/components/schemas/TokenAuth"
+          $ref: "#/components/responses/AuthResponse"
   /register:
     post:
       summary: Register
@@ -66,16 +57,7 @@ paths:
                   type: string
       responses:
         "201":
-          description: User registered successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user:
-                    $ref: "#/components/schemas/UserAuth"
-                  token:
-                    $ref: "#/components/schemas/TokenAuth"
+          $ref: "#/components/responses/AuthResponse"
   /logout:
     post:
       summary: Logout
@@ -156,6 +138,21 @@ components:
         refreshToken:
           type: string
           example: ghijkl0987654321
+  responses:
+    AuthResponse:
+      description: Successful login response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/UserAuth"
+              token:
+                $ref: "#/components/schemas/TokenAuth"
   securitySchemes:
     BearerAuth:
       type: http
