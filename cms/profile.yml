@@ -141,7 +141,8 @@ components:
     TokenAuth:
       type: object
       required:
-        - token
+        - accessToken
+        - refreshToken
       properties:
         accessToken:
           type: string
