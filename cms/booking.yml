@@ -267,42 +267,13 @@ paths:
       responses:
         "201":
           description: Created
-    put:
-      description: "Update a service"
-      tags:
-        - Service
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/service"
-      responses:
-        "200":
-          description: OK
-    delete:
-      description: "Delete a service"
-      tags:
-        - Service
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/id"
-      responses:
-        "204":
-          description: No Content
   /services/{serviceId}:
     get:
       description: "Get a service by id"
       tags:
         - Service
       parameters:
-        - name: serviceId
-          in: path
-          required: true
-          description: "Id of the service"
-          schema:
-            $ref: "#/components/schemas/id"
+        - $ref: "#/components/parameters/serviceId"
       responses:
         "200":
           description: OK
@@ -310,18 +281,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/service"
+    put:
+      description: "Update a service"
+      tags:
+        - Service
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createService"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Delete a service"
+      tags:
+        - Service
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "204":
+          description: No Content
   /services/{serviceId}/teams:
     get:
       description: "Get team members for a service"
       tags:
         - Service
       parameters:
-        - name: serviceId
-          in: path
-          required: true
-          description: "Id of the service"
-          schema:
-            $ref: "#/components/schemas/id"
+        - $ref: "#/components/parameters/serviceId"
       responses:
         "200":
           description: OK
@@ -331,7 +320,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
-
   /industries:
     get:
       description: "Get all industries"
@@ -546,6 +534,9 @@ components:
         - members
         - category
       properties:
+        storeId:
+          $ref: "#/components/schemas/id"
+          description: Id of the store
         name:
           type: string
           example: "Haircut"
@@ -742,6 +733,13 @@ components:
       in: path
       required: true
       description: "Id of a team member"
+      schema:
+        $ref: "#/components/schemas/id"
+    serviceId:
+      name: serviceId
+      in: path
+      required: true
+      description: "Id of the service"
       schema:
         $ref: "#/components/schemas/id"
     start:
