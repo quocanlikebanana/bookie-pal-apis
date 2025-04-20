@@ -4,28 +4,160 @@ info:
   version: "1.0"
 servers:
   - url: https://api.server.test/v1
+security:
+  - BearerAuth: []
+
 paths:
-  /users/{userId}:
-    get:
-      summary: Get user by ID
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          description: The ID of the user to retrieve
-          schema:
-            type: string
+  /login:
+    post:
+      summary: Login
+      description: Login to the system
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
       responses:
         "200":
-          description: User found
+          description: Successful login
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
+                  user:
+                    $ref: "#/components/schemas/UserAuth"
+                  token:
+                    $ref: "#/components/schemas/TokenAuth"
+  /register:
+    post:
+      summary: Register
+      description: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/UserAuth"
+                  token:
+                    $ref: "#/components/schemas/TokenAuth"
+  /logout:
+    post:
+      summary: Logout
+      description: Logout from the system (invalidate token in header)
+      responses:
+        "200":
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
-                  name:
+                    example: "Logged out successfully"
+  /refresh:
+    post:
+      summary: Refresh Token
+      description: Refresh the access token using the refresh token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
                     type: string
-                  email:
-                    type: string
+                    example: abcdef1234567890
+components:
+  schemas:
+    UserAuth:
+      type: object
+      required:
+        - accountId
+        - name
+        - phone
+        - email
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: John Doe
+        phone:
+          type: string
+          example: +1234567890
+        email:
+          type: string
+          example: johndoe@gmail.com
+          format: email
+        avatar:
+          type: string
+          example: https://example.com/avatar.jpg
+    TokenAuth:
+      type: object
+      required:
+        - token
+      properties:
+        accessToken:
+          type: string
+          example: abcdef1234567890
+        refreshToken:
+          type: string
+          example: ghijkl0987654321
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
