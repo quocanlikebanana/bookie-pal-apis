@@ -203,6 +203,156 @@ paths:
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
 
+  /teams:
+    post:
+      description: "Create a team member"
+      tags:
+        - Team
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeam"
+      responses:
+        "201":
+          description: Created
+  /teams/{teamId}:
+    get:
+      description: "Get a team member by id"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+    delete:
+      description: "Remove a team member from a store"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountId
+              properties:
+                accountId:
+                  $ref: "#/components/schemas/id"
+                  description: Id of the account to be removed from the store
+      responses:
+        "204":
+          description: No Content
+  /teams/{teamId}/role:
+    patch:
+      description: "Update role of a team member in a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  $ref: "#/components/schemas/CMSRole"
+      responses:
+        "200":
+          description: OK
+  /teams/{teamId}/work-hours:
+    patch:
+      description: "Update work hours of a team member in a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workHoursInWeek"
+      responses:
+        "200":
+          description: OK
+  /teams/{teamId}/time-off:
+    get:
+      description: "Get time off of a team member in a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - fromDate
+                    - toDate
+                  properties:
+                    fromDate:
+                      $ref: "#/components/schemas/dateTime"
+                      description: Start date of the time off
+                    toDate:
+                      $ref: "#/components/schemas/dateTime"
+                      description: End date of the time off
+    post:
+      description: "Create a time off for a team member in a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - start
+                - end
+              properties:
+                fromDate:
+                  $ref: "#/components/schemas/dateTime"
+                toDate:
+                  $ref: "#/components/schemas/dateTime"
+      responses:
+        "201":
+          description: Created
+    delete:
+      description: "Delete a time off for a team member in a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - teamTimeOffId
+              properties:
+                teamTimeOffId:
+                  $ref: "#/components/schemas/id"
+                  description: Id of the time off to be deleted of the team
+      responses:
+        "204":
+          description: No Content
   /teams/{teamId}/availability:
     get:
       description: "Get availability of a team member in a store in time range"
@@ -320,6 +470,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
+
   /industries:
     get:
       description: "Get all industries"
@@ -638,7 +789,6 @@ components:
             id:
               $ref: "#/components/schemas/id"
               description: Id of the customer in Booking domain (not the account id).
-
     bookingStatus:
       type: string
       enum:
@@ -713,6 +863,41 @@ components:
           description: Total number of pages, starts from 1
           minimum: 1
 
+    CMSRole:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+      description: Role of the user (1 - admin, 2 - manager, 3 - employee)
+    CreateTeam:
+      type: object
+      required:
+        - accountId
+        - storeId
+        - role
+        - workHours
+      properties:
+        accountId:
+          $ref: "#/components/schemas/id"
+          description: Id of the account
+        storeId:
+          $ref: "#/components/schemas/id"
+          description: Id of the store
+        role:
+          $ref: "#/components/schemas/CMSRole"
+        workHours:
+          $ref: "#/components/schemas/workHoursInWeek"
+    Team:
+      allOf:
+        - $ref: "#/components/schemas/CreateTeam"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+              description: Id of the team member in Booking domain (not the account id).
   parameters:
     accountId:
       name: accountId

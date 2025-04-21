@@ -102,16 +102,74 @@ paths:
                   accessToken:
                     type: string
                     example: abcdef1234567890
+  /accounts:
+    get:
+      summary: Get User Info
+      description: Get user information by account ID
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "./common.yml#/components/schemas/Pagination"
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        description: List of user information
+                        items:
+                          $ref: "#/components/schemas/User"
+  /accounts/{accountId}:
+    get:
+      summary: Get User Info
+      description: Get user information by account ID
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /accounts/many:
+    get:
+      summary: Get Multiple User Info
+      description: Get multiple user information by account IDs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountIds
+              properties:
+                accountIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
 components:
   schemas:
     Role:
       type: number
       enum:
-        - 0
         - 1
         - 2
-        - 3
-      description: Role of the user (0 - client, 1 - admin, 2 - manager, 3 - employee)
+      description: Role of the user (1 - Client, 2 - CMS)
     UserAuth:
       type: object
       required:
@@ -152,6 +210,21 @@ components:
         refreshToken:
           type: string
           example: ghijkl0987654321
+    User:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/UserAuth"
+        - $ref: "./common.yml#/components/schemas/TimestampFields"
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: Account ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
   responses:
     AuthResponse:
       description: Successful login response

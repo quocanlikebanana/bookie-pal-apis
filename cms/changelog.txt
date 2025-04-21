@@ -1,0 +1,20 @@
+## Booking >> Teams:
+(*) Added:
+- CMS Role schema: Admin = 1, Manager = 2, Employee = 3
+- Team schema, different from old TeamMemberSmall schema
+- POST /teams => Creates a Team of the store
+- GET /teams/{teamId} => Get a Team
+- DELETE /teams/{teamId} => Remove Team by team id
+- PATCH /teams/{teamId}/role => Update team's role
+- PATCH /teams/{teamId}/work-hours => Update team's workHours (Mon - Sun)
+- GET /teams/{teamId}/time-off => Get team's all time-off
+- POST /teams/{teamId}/time-off => Add time-off for a team
+- GET /teams/{teamId}/time-off => Remove time-off for a team
+
+## Profile
+(*) Updated:
+- Role schema now only have 2 roles: Client = 1, CMS = 2. 
+(*) Added:
+- GET /accounts => Get all accounts with paging.
+- GET /accounts/{accountId} => Get an account
+- GET /accounts/many => Get accounts by IDs (return array)
