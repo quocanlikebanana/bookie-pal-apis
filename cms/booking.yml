@@ -233,20 +233,9 @@ paths:
     delete:
       description: "Remove a team member from a store"
       tags:
-        - Store
+        - Team
       parameters:
-        - $ref: "#/components/parameters/storeId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - accountId
-              properties:
-                accountId:
-                  $ref: "#/components/schemas/id"
-                  description: Id of the account to be removed from the store
+        - $ref: "#/components/parameters/teamId"
       responses:
         "204":
           description: No Content
