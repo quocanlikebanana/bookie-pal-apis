@@ -1,4 +1,19 @@
+==========================================
+24/04/2025:
+## Booking:
+UPDATE:
+- GET /stores/{storeId}/v2/customers => Get all account IDs of booked (update from old API)
+ADD:
+- GET /stores/{storeId}/anomynous-customers => Get all anomynous customer (full information, just don't have the accountId)
+- GET /stores/{storeId}/customers/{accountId} => Get all booking profile of the customer (group by accountId)
+- POST /anomynous-customers => Add an anomynous profile for booking anomynously
+
+==========================================
+22/04/2025:
+
 ## Booking >> Teams:
+(*) Migrate:
+- GET /stores/{storeId}/v2/teams => Change TeamMemberSmall schema to new Team schema and add Pagination
 (*) Added:
 - CMS Role schema: Admin = 1, Manager = 2, Employee = 3
 - Team schema, different from old TeamMemberSmall schema

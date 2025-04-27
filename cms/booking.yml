@@ -203,6 +203,123 @@ paths:
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
 
+  /stores/{storeId}/v2/teams:
+    get:
+      description: "Get team members for a store version 2"
+      tags:
+        - Store
+        - Upgrade
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - teams
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  teams:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Team"
+  /stores/{storeId}/v2/customers:
+    get:
+      description: "Get customers booked that has account (customers version 2)"
+      tags:
+        - Store
+        - Upgrade
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/search"
+          description: "Search string for filtering, search by name  or phone number of booked record"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - customers
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  customers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/id"
+                      description: Account IDs.
+  /stores/{storeId}/customers/{accountId}:
+    get:
+      description: "Get all booked profile(s) of the customer of the store by accountId"
+      tags:
+        - Store
+        - Upgrade
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/accountId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/search"
+          description: "Search string for filtering, search by name  or phone number of booked record"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - customers
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  customers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/customer"
+  /stores/{storeId}/anomynous-customers:
+    get:
+      description: "Get customers booked that has no account (accountId is null) (no need to distinct)"
+      tags:
+        - Store
+        - Upgrade
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/search"
+          description: "Search string for filtering, search by name  or phone number of booked record"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - customers
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  customers:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/customer"
+
   /teams:
     post:
       description: "Create a team member"
@@ -459,6 +576,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/teamMemberSmall"
+
+  /anomynous-customers:
+    post:
+      description: "Create a customer with no account (anomynous)"
+      tags:
+        - Customer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createCustomer"
+      responses:
+        "201":
+          description: Created
 
   /industries:
     get:
@@ -887,6 +1018,31 @@ components:
             id:
               $ref: "#/components/schemas/id"
               description: Id of the team member in Booking domain (not the account id).
+    SMSAccount:
+      type: object
+      required:
+        - smsAccount
+        - smsPassword
+        - storeId
+      properties:
+        smsAccount:
+          type: string
+          description: SMS account name
+          example: "sms_account"
+        smsPassword:
+          type: string
+          description: SMS account password
+          example: "sms_password"
+          format: password
+        storeId:
+          $ref: "#/components/schemas/id"
+          description: Id of the store
+        order:
+          type: integer
+          description: Order of the SMS account in the list
+          example: 1
+          minimum: 0
+
   parameters:
     accountId:
       name: accountId
@@ -953,3 +1109,11 @@ components:
         example: 10
         minimum: 1
         maximum: 1000
+    search:
+      name: search
+      in: query
+      required: false
+      description: "Search string for filtering"
+      schema:
+        type: string
+        example: "John Doe"
