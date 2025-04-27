@@ -169,7 +169,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/service"
+                  $ref: "#/components/schemas/Service"
   /stores/{storeId}/customers:
     get:
       description: "Get customers of a store."
@@ -201,7 +201,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/teamMemberSmall"
+                  $ref: "#/components/schemas/id"
+                  description: "Array of team IDs"
 
   /stores/{storeId}/v2/teams:
     get:
@@ -508,7 +509,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/service"
+                  $ref: "#/components/schemas/Service"
 
   /services:
     post:
@@ -519,7 +520,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/createService"
+              $ref: "#/components/schemas/CreateService"
       responses:
         "201":
           description: Created
@@ -536,7 +537,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/service"
+                $ref: "#/components/schemas/Service"
     put:
       description: "Update a service"
       tags:
@@ -547,7 +548,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/createService"
+              $ref: "#/components/schemas/CreateService"
       responses:
         "200":
           description: OK
@@ -575,7 +576,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/teamMemberSmall"
+                  $ref: "#/components/schemas/id"
+                  description: "Array of team IDs"
 
   /anomynous-customers:
     post:
@@ -771,75 +773,6 @@ components:
       format: date-time
       example: "2021-01-01T09:00:00Z"
       description: Date time in ISO 8601 format
-    teamMemberSmall:
-      type: object
-      required:
-        - id
-        - name
-        - role
-      properties:
-        id:
-          $ref: "#/components/schemas/id"
-        name:
-          type: string
-          example: "John Doe"
-          description: Name of the team member
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the team member
-        role:
-          type: string
-          enum:
-            - admin
-            - manager
-            - employee
-          example: "admin"
-          description: Role of the team member
-    createService:
-      type: object
-      required:
-        - name
-        - description
-        - duration
-        - members
-        - category
-      properties:
-        storeId:
-          $ref: "#/components/schemas/id"
-          description: Id of the store
-        name:
-          type: string
-          example: "Haircut"
-          description: Name of the service
-        description:
-          type: string
-          example: "A simple haircut service"
-          description: Description of the service
-        duration:
-          type: integer
-          example: 30
-          description: Duration of the service in minutes.
-          minimum: 0
-        members:
-          type: array
-          items:
-            $ref: "#/components/schemas/teamMemberSmall"
-          description: Team members who can provide the service
-        category:
-          type: string
-          example: "Hair"
-          description: Category of the service
-    service:
-      allOf:
-        - $ref: "#/components/schemas/createService"
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "#/components/schemas/id"
-              description: Id of the service in Booking domain.
     book:
       type: object
       required:
@@ -856,7 +789,7 @@ components:
           example: "123e4567-e89b-12d3-a456-426614174000"
           description: Id of the service
         service:
-          $ref: "#/components/schemas/service"
+          $ref: "#/components/schemas/Service"
         customer:
           $ref: "#/components/schemas/customer"
         start:
@@ -1042,6 +975,51 @@ components:
           description: Order of the SMS account in the list
           example: 1
           minimum: 0
+    CreateService:
+      type: object
+      required:
+        - name
+        - description
+        - duration
+        - members
+        - category
+      properties:
+        storeId:
+          $ref: "#/components/schemas/id"
+          description: Id of the store
+        name:
+          type: string
+          example: "Haircut"
+          description: Name of the service
+        description:
+          type: string
+          example: "A simple haircut service"
+          description: Description of the service
+        duration:
+          type: integer
+          example: 30
+          description: Duration of the service in minutes.
+          minimum: 0
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/id"
+            description: "Team member ID array"
+          description: Team members who can provide the service
+        category:
+          type: string
+          example: "Hair"
+          description: Category of the service
+    Service:
+      allOf:
+        - $ref: "#/components/schemas/CreateService"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "#/components/schemas/id"
+              description: Id of the service in Booking domain.
 
   parameters:
     accountId:

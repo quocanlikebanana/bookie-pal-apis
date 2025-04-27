@@ -1,4 +1,13 @@
 ==========================================
+27/04/2025:
+
+## Booking:
+- Remove schema TeamMemberSmall and replace it with id (it is account ID of the Team)
+- Affected endpoints:
++ /stores/{storeId}/services (in members array)
++ /stores/{storeId}/teams
+
+==========================================
 24/04/2025:
 ## Booking:
 UPDATE:
