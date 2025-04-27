@@ -548,16 +548,24 @@ paths:
         - Service
       parameters:
         - $ref: "#/components/parameters/serviceId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "#/components/parameters/search"
+          description: "Search string for filtering, search by name of the team member"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/id"
-                  description: "Array of team IDs"
+                type: object
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  teams:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Team"
 
   /anomynous-customers:
     post:
@@ -909,6 +917,7 @@ components:
     CreateTeam:
       type: object
       required:
+        - name
         - accountId
         - storeId
         - role
