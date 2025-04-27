@@ -104,23 +104,42 @@ paths:
                     example: abcdef1234567890
   /accounts:
     get:
-      summary: Get User Info
-      description: Get user information by account ID
+      summary: Get users information
+      parameters:
+        - name: search
+          in: query
+          description: Search by name
+          required: false
+          schema:
+            type: string
+            example: John
+        - name: role
+          in: query
+          description: Filter by role (1 - Client, 2 - CMS)
+          required: false
+          schema:
+            type: number
+            enum:
+              - 1
+              - 2
+            example: 1
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
       responses:
         "200":
           description: User information retrieved successfully
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "./common.yml#/components/schemas/Pagination"
-                  - type: object
-                    properties:
-                      items:
-                        type: array
-                        description: List of user information
-                        items:
-                          $ref: "#/components/schemas/User"
+                type: object
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  accounts:
+                    type: array
+                    description: List of user information
+                    items:
+                      $ref: "#/components/schemas/User"
   /accounts/{accountId}:
     get:
       summary: Get User Info

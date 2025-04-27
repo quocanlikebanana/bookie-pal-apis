@@ -1,8 +1,22 @@
 ==========================================
+28/04/2025:
+
+## Booking:
+- Remove GET /stores/{storeId}/customers
+- Remove GET /stores/{storeId}/teams
+- GET /stores/{storeId}/services: Add search in query
+- GET /stores/{storeId}/v2/teams: Add search in query
+- GET /stores/{storeId}/v2/customers: Add search in query
+## Profile:
+- GET /accounts:
++ Add search, role query
++ Change pagination response
+
+==========================================
 27/04/2025:
 
 ## Booking:
-- Remove schema TeamMemberSmall and replace it with id (it is account ID of the Team)
+- Remove schema TeamMemberSmall and replace it with Team schema (new schema for Team)
 - Affected endpoints:
 + /stores/{storeId}/services (in members array)
 + /stores/{storeId}/teams

@@ -25,8 +25,8 @@ paths:
         - Store
       parameters:
         - $ref: "#/components/parameters/accountId"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
       responses:
         "200":
           description: OK
@@ -39,7 +39,7 @@ paths:
                   - stores
                 properties:
                   pagination:
-                    $ref: "#/components/schemas/pagination"
+                    $ref: "./common.yml#/components/schemas/Pagination"
                   stores:
                     type: array
                     items:
@@ -51,8 +51,8 @@ paths:
       tags:
         - Store
       parameters:
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
       responses:
         "200":
           description: OK
@@ -65,7 +65,7 @@ paths:
                   - stores
                 properties:
                   pagination:
-                    $ref: "#/components/schemas/pagination"
+                    $ref: "./common.yml#/components/schemas/Pagination"
                   stores:
                     type: array
                     items:
@@ -161,6 +161,15 @@ paths:
         - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - name: search
+          in: query
+          required: false
+          description: "Search string for filtering, search by name of the service"
+          schema:
+            type: string
+            example: "Haircut"
       responses:
         "200":
           description: OK
@@ -170,50 +179,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Service"
-  /stores/{storeId}/customers:
-    get:
-      description: "Get customers of a store."
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/customer"
-  /stores/{storeId}/teams:
-    get:
-      description: "Get team members for a store"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/id"
-                  description: "Array of team IDs"
-
   /stores/{storeId}/v2/teams:
     get:
       description: "Get team members for a store version 2"
       tags:
         - Store
-        - Upgrade
       parameters:
         - $ref: "#/components/parameters/storeId"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - name: search
+          in: query
+          required: false
+          description: "Search string for filtering, search by name of the team member"
+          schema:
+            type: string
+            example: "John Doe"
       responses:
         "200":
           description: OK
@@ -236,11 +217,10 @@ paths:
       description: "Get customers booked that has account (customers version 2)"
       tags:
         - Store
-        - Upgrade
       parameters:
         - $ref: "#/components/parameters/storeId"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "#/components/parameters/search"
           description: "Search string for filtering, search by name  or phone number of booked record"
       responses:
@@ -270,8 +250,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/accountId"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "#/components/parameters/search"
           description: "Search string for filtering, search by name  or phone number of booked record"
       responses:
@@ -299,8 +279,8 @@ paths:
         - Upgrade
       parameters:
         - $ref: "#/components/parameters/storeId"
-        - $ref: "#/components/parameters/page"
-        - $ref: "#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "#/components/parameters/search"
           description: "Search string for filtering, search by name  or phone number of booked record"
       responses:
@@ -832,6 +812,9 @@ components:
         avatar:
           type: string
           example: "https://example.com/avatar.jpg"
+        storeId:
+          $ref: "#/components/schemas/id"
+          description: Id of the store
     customer:
       allOf:
         - $ref: "#/components/schemas/createCustomer"
@@ -937,6 +920,10 @@ components:
         storeId:
           $ref: "#/components/schemas/id"
           description: Id of the store
+        name:
+          type: string
+          example: "John Doe"
+          description: Name of the team member
         role:
           $ref: "#/components/schemas/CMSRole"
         workHours:
@@ -1011,15 +998,43 @@ components:
           example: "Hair"
           description: Category of the service
     Service:
-      allOf:
-        - $ref: "#/components/schemas/CreateService"
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "#/components/schemas/id"
-              description: Id of the service in Booking domain.
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - duration
+        - members
+        - category
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+          description: Id of the service
+        storeId:
+          $ref: "#/components/schemas/id"
+          description: Id of the store
+        name:
+          type: string
+          example: "Haircut"
+          description: Name of the service
+        description:
+          type: string
+          example: "A simple haircut service"
+          description: Description of the service
+        duration:
+          type: integer
+          example: 30
+          description: Duration of the service in minutes.
+          minimum: 0
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/Team"
+          description: Team members who can provide the service
+        category:
+          type: string
+          example: "Hair"
+          description: Category of the service
 
   parameters:
     accountId:
@@ -1068,25 +1083,6 @@ components:
         type: string
         format: date-time
         example: "2021-01-01T18:00:00Z"
-    page:
-      name: page
-      in: query
-      required: false
-      description: "Page number for pagination"
-      schema:
-        type: integer
-        example: 1
-        minimum: 1
-    limit:
-      name: limit
-      in: query
-      required: false
-      description: "Limit number of items per page"
-      schema:
-        type: integer
-        example: 10
-        minimum: 1
-        maximum: 1000
     search:
       name: search
       in: query
