@@ -150,7 +150,7 @@ paths:
                   example: "Please bring your own mask"
                   description: Comment for the service
                 customer:
-                  $ref: "#/components/schemas/createCustomer"
+                  $ref: "#/components/schemas/CreateCustomer"
       responses:
         "201":
           description: Created
@@ -163,22 +163,25 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - name: search
-          in: query
-          required: false
+        - $ref: "#/components/parameters/search"
           description: "Search string for filtering, search by name of the service"
-          schema:
-            type: string
-            example: "Haircut"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Service"
+                type: object
+                required:
+                  - pagination
+                  - services
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
   /stores/{storeId}/v2/teams:
     get:
       description: "Get team members for a store version 2"
@@ -188,13 +191,8 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - name: search
-          in: query
-          required: false
+        - $ref: "#/components/parameters/search"
           description: "Search string for filtering, search by name of the team member"
-          schema:
-            type: string
-            example: "John Doe"
       responses:
         "200":
           description: OK
@@ -270,7 +268,7 @@ paths:
                   customers:
                     type: array
                     items:
-                      $ref: "#/components/schemas/customer"
+                      $ref: "#/components/schemas/Customer"
   /stores/{storeId}/anomynous-customers:
     get:
       description: "Get customers booked that has no account (accountId is null) (no need to distinct)"
@@ -282,7 +280,7 @@ paths:
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "#/components/parameters/search"
-          description: "Search string for filtering, search by name  or phone number of booked record"
+          description: "Search string for filtering, search by name of booked customers record (without accountId)"
       responses:
         "200":
           description: OK
@@ -299,7 +297,7 @@ paths:
                   customers:
                     type: array
                     items:
-                      $ref: "#/components/schemas/customer"
+                      $ref: "#/components/schemas/Customer"
 
   /teams:
     post:
@@ -576,7 +574,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/createCustomer"
+              $ref: "#/components/schemas/CreateCustomer"
       responses:
         "201":
           description: Created
@@ -779,7 +777,7 @@ components:
         service:
           $ref: "#/components/schemas/Service"
         customer:
-          $ref: "#/components/schemas/customer"
+          $ref: "#/components/schemas/Customer"
         start:
           type: string
           format: date-time
@@ -796,11 +794,13 @@ components:
           description: Comment for the service
         status:
           $ref: "#/components/schemas/bookingStatus"
-    createCustomer:
+    CreateCustomer:
       type: object
       required:
         - name
         - phone
+        - email
+        - storeId
       properties:
         accountId:
           $ref: "#/components/schemas/id"
@@ -823,9 +823,9 @@ components:
         storeId:
           $ref: "#/components/schemas/id"
           description: Id of the store
-    customer:
+    Customer:
       allOf:
-        - $ref: "#/components/schemas/createCustomer"
+        - $ref: "#/components/schemas/CreateCustomer"
         - type: object
           required:
             - id
