@@ -23,6 +23,15 @@ components:
         minimum: 1
         maximum: 1000
 
+    search:
+      name: search
+      in: query
+      required: false
+      description: "Search term for filtering results"
+      schema:
+        type: string
+        example: "my search term"
+
   schemas:
     Pagination:
       type: object

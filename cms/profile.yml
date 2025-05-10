@@ -97,11 +97,10 @@ paths:
               schema:
                 type: object
                 required:
-                  - accessToken
+                  - token
                 properties:
-                  accessToken:
-                    type: string
-                    example: abcdef1234567890
+                  token:
+                    $ref: "#/components/schemas/TokenAuth"
   /accounts:
     get:
       summary: Get users information
@@ -214,6 +213,9 @@ components:
           type: string
           example: johndoe@gmail.com
           format: email
+        address:
+          type: string
+          example: 123 Main St, City, Country
         avatar:
           type: string
           example: https://example.com/avatar.jpg
@@ -234,6 +236,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/UserAuth"
         - $ref: "./common.yml#/components/schemas/TimestampFields"
+
   parameters:
     AccountId:
       name: accountId
@@ -244,6 +247,7 @@ components:
         type: string
         format: uuid
         example: 123e4567-e89b-12d3-a456-426614174000
+
   responses:
     AuthResponse:
       description: Successful login response
@@ -259,6 +263,7 @@ components:
                 $ref: "#/components/schemas/UserAuth"
               token:
                 $ref: "#/components/schemas/TokenAuth"
+
   securitySchemes:
     BearerAuth:
       type: http

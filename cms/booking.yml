@@ -43,7 +43,7 @@ paths:
                   stores:
                     type: array
                     items:
-                      $ref: "#/components/schemas/store"
+                      $ref: "#/components/schemas/Store"
 
   /stores:
     get:
@@ -51,8 +51,19 @@ paths:
       tags:
         - Store
       parameters:
+        - $ref: "./common.yml#/components/parameters/search"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
+        - name: industries
+          in: query
+          required: false
+          description: "Filter stores by array industries"
+          schema:
+            type: array
+            items:
+              type: string
+              example: "Beauty"
+              description: Name of the industry
       responses:
         "200":
           description: OK
@@ -69,7 +80,19 @@ paths:
                   stores:
                     type: array
                     items:
-                      $ref: "#/components/schemas/store"
+                      $ref: "#/components/schemas/Store"
+    post:
+      description: "Create a store"
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Store"
+      responses:
+        "201":
+          description: Created
   /stores/{storeId}:
     get:
       description: "Get a store by id"
@@ -83,7 +106,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/store"
+                $ref: "#/components/schemas/Store"
   /stores/{storeId}/availability:
     get:
       description: "Get availability of a store in a from start time to end time"
@@ -269,7 +292,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Customer"
-  /stores/{storeId}/anomynous-customers:
+  /stores/{storeId}/anonymous-customers:
     get:
       description: "Get customers booked that has no account (accountId is null) (no need to distinct)"
       tags:
@@ -565,9 +588,9 @@ paths:
                     items:
                       $ref: "#/components/schemas/Team"
 
-  /anomynous-customers:
+  /anonymous-customers:
     post:
-      description: "Create a customer with no account (anomynous)"
+      description: "Create a customer with no account (anonymous)"
       tags:
         - Customer
       requestBody:
@@ -794,6 +817,88 @@ components:
           description: Comment for the service
         status:
           $ref: "#/components/schemas/bookingStatus"
+    bookingStatus:
+      type: string
+      enum:
+        - new
+        - ready
+        - denined
+        - done
+      example: "new"
+      description: Status of the booking.
+    pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+          description: Current page number, starts from 1
+          minimum: 1
+        limit:
+          type: integer
+          example: 10
+          description: Limit number of items per page, starts from 1
+          minimum: 1
+          maximum: 1000
+        totalItems:
+          type: integer
+          example: 100
+          description: Total number of items in the database
+          minimum: 0
+        totalPages:
+          type: integer
+          example: 10
+          description: Total number of pages, starts from 1
+          minimum: 1
+
+    Store:
+      type: object
+      required:
+        - id
+        - adminId
+        - name
+        - description
+        - address
+        - industry
+        - phone
+        - timezone
+        - workHours
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        adminId:
+          $ref: "#/components/schemas/id"
+          description: Id of the admin account
+        name:
+          type: string
+          example: "My Store"
+          description: Name of the store
+        description:
+          type: string
+          example: "A simple store"
+          description: Description of the store
+        address:
+          type: string
+          example: "123, Example Street, City, Country"
+          description: Address of the store
+        industry:
+          type: string
+          example: "Beauty"
+          description: Industry of the store
+        phone:
+          type: string
+          example: "+1234567890"
+          description: Phone number of the store
+        timezone:
+          type: string
+          example: "Asia/Kolkata"
+          description: Timezone of the store
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the store
+        workHours:
+          $ref: "#/components/schemas/workHoursInWeek"
     CreateCustomer:
       type: object
       required:
@@ -804,7 +909,7 @@ components:
       properties:
         accountId:
           $ref: "#/components/schemas/id"
-          description: Id of the customer account. This is optional and can be null if the customer is anomynous.
+          description: Id of the customer account. This is optional and can be null if the customer is anonymous.
         name:
           type: string
           example: "John Doe"
@@ -833,80 +938,6 @@ components:
             id:
               $ref: "#/components/schemas/id"
               description: Id of the customer in Booking domain (not the account id).
-    bookingStatus:
-      type: string
-      enum:
-        - new
-        - ready
-        - denined
-        - done
-      example: "new"
-      description: Status of the booking.
-    store:
-      type: object
-      required:
-        - id
-        - name
-        - description
-        - address
-        - industry
-        - phone
-        - timezone
-        - workHours
-      properties:
-        id:
-          $ref: "#/components/schemas/id"
-        name:
-          type: string
-          example: "My Store"
-          description: Name of the store
-        description:
-          type: string
-          example: "A simple store"
-          description: Description of the store
-        address:
-          type: string
-          example: "123, Example Street, City, Country"
-          description: Address of the store
-        industry:
-          type: string
-          example: "Beauty"
-          description: Industry of the store
-        phone:
-          type: string
-          example: "+1234567890"
-          description: Phone number of the store
-        timezone:
-          type: string
-          example: "Asia/Kolkata"
-          description: Timezone of the store
-        workHours:
-          $ref: "#/components/schemas/workHoursInWeek"
-    pagination:
-      type: object
-      properties:
-        currentPage:
-          type: integer
-          example: 1
-          description: Current page number, starts from 1
-          minimum: 1
-        limit:
-          type: integer
-          example: 10
-          description: Limit number of items per page, starts from 1
-          minimum: 1
-          maximum: 1000
-        totalItems:
-          type: integer
-          example: 100
-          description: Total number of items in the database
-          minimum: 0
-        totalPages:
-          type: integer
-          example: 10
-          description: Total number of pages, starts from 1
-          minimum: 1
-
     CMSRole:
       type: number
       enum:
@@ -933,6 +964,10 @@ components:
           type: string
           example: "John Doe"
           description: Name of the team member
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the team member
         role:
           $ref: "#/components/schemas/CMSRole"
         workHours:
@@ -975,10 +1010,8 @@ components:
       type: object
       required:
         - name
-        - description
         - duration
         - members
-        - category
       properties:
         storeId:
           $ref: "#/components/schemas/id"
@@ -1006,6 +1039,14 @@ components:
           type: string
           example: "Hair"
           description: Category of the service
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the service
+        hidden:
+          type: boolean
+          example: false
+          description: Is the service hidden or not
     Service:
       type: object
       required:
@@ -1015,6 +1056,7 @@ components:
         - duration
         - members
         - category
+        - storeId
       properties:
         id:
           $ref: "#/components/schemas/id"
@@ -1044,6 +1086,10 @@ components:
           type: string
           example: "Hair"
           description: Category of the service
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the service
 
   parameters:
     accountId:
