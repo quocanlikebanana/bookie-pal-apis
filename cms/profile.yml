@@ -261,13 +261,8 @@ paths:
                 email:
                   type: string
                   format: email
-                role:
-                  type: number
-                  enum:
-                    - 1
-                    - 2
-                    - 3
-                  description: Role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+                cmsRole:
+                  $ref: "#/components/schemas/CmsRole"
       responses:
         "201":
           description: User invited successfully
@@ -335,6 +330,13 @@ components:
         - 1
         - 2
       description: Role of the user (1 - Client, 2 - CMS)
+    CmsRole:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+      description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
     User:
       type: object
       required:
@@ -389,12 +391,7 @@ components:
                 - 2
               description: Role of the user (2 - CMS)
             cmsRole:
-              type: number
-              enum:
-                - 1
-                - 2
-                - 3
-              description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+              $ref: "#/components/schemas/CmsRole"
             storeId:
               type: string
               format: uuid
