@@ -384,6 +384,9 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/User"
+        - required:
+            - cmsRole
+            - storeId
         - properties:
             role:
               type: number

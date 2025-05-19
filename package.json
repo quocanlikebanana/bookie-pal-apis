@@ -1,0 +1,23 @@
+{
+  "name": "mock-apis",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "mock"
+  ],
+  "homepage": "https://github.com/quocanlikebanana/bookie-pal-apis#readme",
+  "bugs": {
+    "url": "https://github.com/quocanlikebanana/bookie-pal-apis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quocanlikebanana/bookie-pal-apis.git"
+  },
+  "license": "ISC",
+  "author": "ango",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

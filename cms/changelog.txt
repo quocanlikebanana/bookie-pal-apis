@@ -35,9 +35,9 @@
 UPDATE:
 - GET /stores/{storeId}/v2/customers => Get all account IDs of booked (update from old API)
 ADD:
-- GET /stores/{storeId}/anomynous-customers => Get all anomynous customer (full information, just don't have the accountId)
+- GET /stores/{storeId}/anonymous-customers => Get all anonymous customer (full information, just don't have the accountId)
 - GET /stores/{storeId}/customers/{accountId} => Get all booking profile of the customer (group by accountId)
-- POST /anomynous-customers => Add an anomynous profile for booking anomynously
+- POST /anonymous-customers => Add an anonymous profile for booking anonymously
 
 ==========================================
 22/04/2025:
