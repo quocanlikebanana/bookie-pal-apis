@@ -190,7 +190,7 @@ paths:
       description: Login to the system with store ID
       security: []
       parameters:
-        - $ref: "#/components/parameters/AccountId"
+        - $ref: "#/components/parameters/StoreId"
       requestBody:
         required: true
         content:
@@ -214,7 +214,7 @@ paths:
       description: Register a new user in the store after the invitation
       security: []
       parameters:
-        - $ref: "#/components/parameters/AccountId"
+        - $ref: "#/components/parameters/StoreId"
       requestBody:
         required: true
         content:
@@ -247,7 +247,7 @@ paths:
       summary: Store Invite
       description: Invite a user to the store
       parameters:
-        - $ref: "#/components/parameters/AccountId"
+        - $ref: "#/components/parameters/StoreId"
       requestBody:
         required: true
         content:
