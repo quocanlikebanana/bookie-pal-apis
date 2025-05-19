@@ -90,6 +90,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Store"
+
       responses:
         "201":
           description: Created
@@ -1051,12 +1052,11 @@ components:
       type: object
       required:
         - id
+        - storeId
         - name
-        - description
         - duration
         - members
-        - category
-        - storeId
+        - hidden
       properties:
         id:
           $ref: "#/components/schemas/id"
@@ -1090,6 +1090,10 @@ components:
           type: string
           example: "https://example.com/avatar.jpg"
           description: Avatar of the service
+        hidden:
+          type: boolean
+          example: false
+          description: Is the service hidden or not
 
   parameters:
     accountId:

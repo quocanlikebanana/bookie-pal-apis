@@ -55,6 +55,9 @@ paths:
                   type: string
                 phone:
                   type: string
+                avatar:
+                  type: string
+                  format: uri
       responses:
         "201":
           $ref: "#/components/responses/AuthResponse"
@@ -180,6 +183,150 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
+
+  /stores/{storeId}/login:
+    post:
+      summary: Store Login
+      description: Login to the system with store ID
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/CMSAuthResponse"
+  /stores/{storeId}/register:
+    post:
+      summary: Store Register
+      description: Register a new user in the store after the invitation
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  format: uri
+      responses:
+        "201":
+          $ref: "#/components/responses/CMSAuthResponse"
+  /stores/{storeId}/invite:
+    post:
+      summary: Store Invite
+      description: Invite a user to the store
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - role
+              properties:
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: number
+                  enum:
+                    - 1
+                    - 2
+                    - 3
+                  description: Role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+      responses:
+        "201":
+          description: User invited successfully
+  /stores/{storeId}/accounts:
+    get:
+      summary: Get Store accounts
+      description: Get accounts of a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - name: search
+          in: query
+          description: Search by name
+          required: false
+          schema:
+            type: string
+            example: John
+        - name: role
+          in: query
+          description: Filter by role (1 - Admin, 2 - Manager, 3 - Employee)
+          required: false
+          schema:
+            type: number
+            enum:
+              - 1
+              - 2
+              - 3
+            example: 1
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+      responses:
+        "200":
+          description: Store users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  accounts:
+                    type: array
+                    description: List of store users information
+                    items:
+                      $ref: "#/components/schemas/CMSUser"
+  /stores/{storeId}/accounts/{accountId}:
+    get:
+      summary: Get Store User Info
+      description: Get user information by account ID in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: Store user information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CMSUser"
+
 components:
   schemas:
     Role:
@@ -188,7 +335,7 @@ components:
         - 1
         - 2
       description: Role of the user (1 - Client, 2 - CMS)
-    UserAuth:
+    User:
       type: object
       required:
         - accountId
@@ -231,11 +378,27 @@ components:
         refreshToken:
           type: string
           example: ghijkl0987654321
-    User:
+    CMSUser:
       type: object
       allOf:
-        - $ref: "#/components/schemas/UserAuth"
-        - $ref: "./common.yml#/components/schemas/TimestampFields"
+        - $ref: "#/components/schemas/User"
+        - properties:
+            role:
+              type: number
+              enum:
+                - 2
+              description: Role of the user (2 - CMS)
+            cmsRole:
+              type: number
+              enum:
+                - 1
+                - 2
+                - 3
+              description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+            storeId:
+              type: string
+              format: uuid
+              example: 123e4567-e89b-12d3-a456-426614174000
 
   parameters:
     AccountId:
@@ -243,6 +406,15 @@ components:
       in: path
       required: true
       description: Account ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+    StoreId:
+      name: storeId
+      in: path
+      required: true
+      description: Store ID of the user
       schema:
         type: string
         format: uuid
@@ -260,7 +432,21 @@ components:
               - token
             properties:
               user:
-                $ref: "#/components/schemas/UserAuth"
+                $ref: "#/components/schemas/User"
+              token:
+                $ref: "#/components/schemas/TokenAuth"
+    CMSAuthResponse:
+      description: Successful CMS login response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/CMSUser"
               token:
                 $ref: "#/components/schemas/TokenAuth"
 
