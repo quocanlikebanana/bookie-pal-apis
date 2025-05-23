@@ -822,6 +822,9 @@ components:
             id:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the booking
+            storeId:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the store
             service:
               $ref: "#/components/schemas/Service"
             team:
