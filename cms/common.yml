@@ -33,6 +33,18 @@ components:
         example: "my search term"
 
   schemas:
+    Id:
+      type: string
+      format: uuid
+      example: "123e4567-e89b-12d3-a456-426614174000"
+      description: Id of the entity
+
+    DateTime:
+      type: string
+      format: date-time
+      example: "2021-01-01T09:00:00Z"
+      description: Date time in ISO 8601 format
+
     Pagination:
       type: object
       required:

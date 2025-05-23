@@ -16,11 +16,13 @@ tags:
     description: Industry related operations
   - name: Team
     description: Team related operations
+security:
+  - BearerAuth: []
 
 paths:
   /account/{accountId}/stores:
     get:
-      description: "Get all stores of an account "
+      description: "Get all stores of an account"
       tags:
         - Store
       parameters:
@@ -123,8 +125,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/availability"
-  /stores/{storeId}/booked:
+                $ref: "#/components/schemas/Availability"
+  /stores/{storeId}/book:
     get:
       description: "Get booked services of a store in a time range (all team members)"
       tags:
@@ -141,8 +143,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/book"
-  /stores/{storeId}/book:
+                  $ref: "#/components/schemas/Book"
     post:
       description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
       tags:
@@ -153,28 +154,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - teamId
-                - serviceId
-                - start
-                - end
-                - customer
-              properties:
-                teamId:
-                  $ref: "#/components/schemas/id"
-                serviceId:
-                  $ref: "#/components/schemas/id"
-                start:
-                  $ref: "#/components/schemas/dateTime"
-                end:
-                  $ref: "#/components/schemas/dateTime"
-                comment:
-                  type: string
-                  example: "Please bring your own mask"
-                  description: Comment for the service
-                customer:
-                  $ref: "#/components/schemas/CreateCustomer"
+              $ref: "#/components/schemas/CreateBook"
       responses:
         "201":
           description: Created
@@ -187,7 +167,7 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name of the service"
       responses:
         "200":
@@ -206,7 +186,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Service"
-  /stores/{storeId}/v2/teams:
+  /stores/{storeId}/teams:
     get:
       description: "Get team members for a store version 2"
       tags:
@@ -215,7 +195,7 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name of the team member"
       responses:
         "200":
@@ -234,7 +214,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Team"
-  /stores/{storeId}/v2/customers:
+  /stores/{storeId}/customers:
     get:
       description: "Get customers booked that has account (customers version 2)"
       tags:
@@ -243,7 +223,7 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name  or phone number of booked record"
       responses:
         "200":
@@ -261,7 +241,7 @@ paths:
                   customers:
                     type: array
                     items:
-                      $ref: "#/components/schemas/id"
+                      $ref: "./common.yml#/components/schemas/Id"
                       description: Account IDs.
   /stores/{storeId}/customers/{accountId}:
     get:
@@ -274,7 +254,7 @@ paths:
         - $ref: "#/components/parameters/accountId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name  or phone number of booked record"
       responses:
         "200":
@@ -303,7 +283,7 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name of booked customers record (without accountId)"
       responses:
         "200":
@@ -322,6 +302,26 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Customer"
+
+  /stores/{storeId}/connnection:
+    post:
+      description: "Connect a client to a store, (only for Client)"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Disconnect a client from a store, (only for Client)"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
 
   /teams:
     post:
@@ -390,7 +390,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/workHoursInWeek"
+              $ref: "#/components/schemas/WorkHoursInWeek"
       responses:
         "200":
           description: OK
@@ -415,10 +415,10 @@ paths:
                     - toDate
                   properties:
                     fromDate:
-                      $ref: "#/components/schemas/dateTime"
+                      $ref: "./common.yml#/components/schemas/DateTime"
                       description: Start date of the time off
                     toDate:
-                      $ref: "#/components/schemas/dateTime"
+                      $ref: "./common.yml#/components/schemas/DateTime"
                       description: End date of the time off
     post:
       description: "Create a time off for a team member in a store"
@@ -436,9 +436,9 @@ paths:
                 - end
               properties:
                 fromDate:
-                  $ref: "#/components/schemas/dateTime"
+                  $ref: "./common.yml#/components/schemas/DateTime"
                 toDate:
-                  $ref: "#/components/schemas/dateTime"
+                  $ref: "./common.yml#/components/schemas/DateTime"
       responses:
         "201":
           description: Created
@@ -457,7 +457,7 @@ paths:
                 - teamTimeOffId
               properties:
                 teamTimeOffId:
-                  $ref: "#/components/schemas/id"
+                  $ref: "./common.yml#/components/schemas/Id"
                   description: Id of the time off to be deleted of the team
       responses:
         "204":
@@ -477,8 +477,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/availability"
-  /teams/{teamId}/booked:
+                $ref: "#/components/schemas/Availability"
+  /teams/{teamId}/book:
     get:
       description: "Get booked services of a team member in a store in time range"
       tags:
@@ -495,7 +495,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/book"
+                  $ref: "#/components/schemas/Book"
   /teams/{teamId}/services:
     get:
       description: "Get services of a team member in a store"
@@ -572,7 +572,7 @@ paths:
         - $ref: "#/components/parameters/serviceId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/search"
+        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name of the team member"
       responses:
         "200":
@@ -622,12 +622,7 @@ paths:
 
 components:
   schemas:
-    id:
-      type: string
-      format: uuid
-      example: "123e4567-e89b-12d3-a456-426614174000"
-      description: Id of the entity
-    time:
+    Time:
       type: object
       properties:
         hour:
@@ -645,7 +640,7 @@ components:
       required:
         - hour
         - minute
-    timeRange:
+    TimeRange:
       type: object
       description: Time range in a day. From start to end time (hour and minute).
       required:
@@ -653,18 +648,18 @@ components:
         - end
       properties:
         start:
-          $ref: "#/components/schemas/time"
+          $ref: "#/components/schemas/Time"
           description: Start time
         end:
-          $ref: "#/components/schemas/time"
+          $ref: "#/components/schemas/Time"
           description: End time
-    availability:
+    Availability:
       description: Is an array of time ranges that is available for booking (of a store or a team member). Each item is an array of time ranges in a day.
       type: array
       items:
         type: array
         items:
-          $ref: "#/components/schemas/timeRange"
+          $ref: "#/components/schemas/TimeRange"
       example:
         - - start:
               hour: 9
@@ -696,7 +691,7 @@ components:
             end:
               hour: 18
               minute: 0
-    workHoursInWeek:
+    WorkHoursInWeek:
       type: array
       items:
         type: object
@@ -713,7 +708,7 @@ components:
           workHours:
             type: array
             items:
-              $ref: "#/components/schemas/timeRange"
+              $ref: "#/components/schemas/TimeRange"
             description: Work hours of the team member in a day.
       example:
         - dayOfWeek: 0
@@ -778,47 +773,65 @@ components:
               end:
                 hour: 18
                 minute: 0
-    dateTime:
-      type: string
-      format: date-time
-      example: "2021-01-01T09:00:00Z"
-      description: Date time in ISO 8601 format
-    book:
+
+    BookBase:
       type: object
       required:
-        - id
-        - service
-        - customer
         - start
         - end
-        - status
       properties:
-        id:
-          type: string
-          format: uuid
-          example: "123e4567-e89b-12d3-a456-426614174000"
-          description: Id of the service
-        service:
-          $ref: "#/components/schemas/Service"
-        customer:
-          $ref: "#/components/schemas/Customer"
         start:
-          type: string
-          format: date-time
-          example: "2021-01-01T09:00:00Z"
-          description: Start time of the service
+          $ref: "./common.yml#/components/schemas/DateTime"
         end:
-          type: string
-          format: date-time
-          example: "2021-01-01T09:30:00Z"
-          description: End time of the service
+          $ref: "./common.yml#/components/schemas/DateTime"
+        notification:
+          $ref: "#/components/schemas/BookingNotification"
+          description: Notification for the booking
         comment:
           type: string
           example: "Please bring your own mask"
           description: Comment for the service
-        status:
-          $ref: "#/components/schemas/bookingStatus"
-    bookingStatus:
+    CreateBook:
+      allOf:
+        - $ref: "#/components/schemas/BookBase"
+        - type: object
+          required:
+            - serviceId
+            - teamId
+          properties:
+            serviceId:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the service
+            teamId:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the team member
+            customer:
+              $ref: "#/components/schemas/CreateCustomer"
+              description: Booking profile of the customer.
+    Book:
+      allOf:
+        - $ref: "#/components/schemas/BookBase"
+        - type: object
+          required:
+            - id
+            - service
+            - team
+            - customer
+            - status
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the booking
+            service:
+              $ref: "#/components/schemas/Service"
+            team:
+              $ref: "#/components/schemas/Team"
+            customer:
+              $ref: "#/components/schemas/Customer"
+              description: Booking profile of the customer when they have created the booking (has ID).
+            status:
+              $ref: "#/components/schemas/BookingStatus"
+    BookingStatus:
       type: string
       enum:
         - new
@@ -827,30 +840,20 @@ components:
         - done
       example: "new"
       description: Status of the booking.
-    pagination:
+    BookingNotification:
       type: object
+      required:
+        - smsPassword
+        - storeId
       properties:
-        currentPage:
-          type: integer
-          example: 1
-          description: Current page number, starts from 1
-          minimum: 1
-        limit:
-          type: integer
-          example: 10
-          description: Limit number of items per page, starts from 1
-          minimum: 1
-          maximum: 1000
-        totalItems:
-          type: integer
-          example: 100
-          description: Total number of items in the database
-          minimum: 0
-        totalPages:
-          type: integer
-          example: 10
-          description: Total number of pages, starts from 1
-          minimum: 1
+        email:
+          type: boolean
+          description: Send email notification
+          example: true
+        sms:
+          type: boolean
+          description: Send SMS notification
+          example: true
 
     Store:
       type: object
@@ -863,12 +866,11 @@ components:
         - industry
         - phone
         - timezone
-        - workHours
       properties:
         id:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
         adminId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the admin account
         name:
           type: string
@@ -898,8 +900,7 @@ components:
           type: string
           example: "https://example.com/avatar.jpg"
           description: Avatar of the store
-        workHours:
-          $ref: "#/components/schemas/workHoursInWeek"
+
     CreateCustomer:
       type: object
       required:
@@ -909,7 +910,7 @@ components:
         - storeId
       properties:
         accountId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the customer account. This is optional and can be null if the customer is anonymous.
         name:
           type: string
@@ -927,7 +928,7 @@ components:
           type: string
           example: "https://example.com/avatar.jpg"
         storeId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
     Customer:
       allOf:
@@ -937,7 +938,7 @@ components:
             - id
           properties:
             id:
-              $ref: "#/components/schemas/id"
+              $ref: "./common.yml#/components/schemas/Id"
               description: Id of the customer in Booking domain (not the account id).
     CMSRole:
       type: number
@@ -946,33 +947,25 @@ components:
         - 2
         - 3
       description: Role of the user (1 - admin, 2 - manager, 3 - employee)
+
     CreateTeam:
       type: object
       required:
-        - name
         - accountId
         - storeId
         - role
         - workHours
       properties:
         accountId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the account
         storeId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
-        name:
-          type: string
-          example: "John Doe"
-          description: Name of the team member
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the team member
         role:
           $ref: "#/components/schemas/CMSRole"
         workHours:
-          $ref: "#/components/schemas/workHoursInWeek"
+          $ref: "#/components/schemas/WorkHoursInWeek"
     Team:
       allOf:
         - $ref: "#/components/schemas/CreateTeam"
@@ -981,8 +974,9 @@ components:
             - id
           properties:
             id:
-              $ref: "#/components/schemas/id"
+              $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member in Booking domain (not the account id).
+
     SMSAccount:
       type: object
       required:
@@ -1000,13 +994,14 @@ components:
           example: "sms_password"
           format: password
         storeId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
         order:
           type: integer
           description: Order of the SMS account in the list
           example: 1
           minimum: 0
+
     CreateService:
       type: object
       required:
@@ -1015,7 +1010,7 @@ components:
         - members
       properties:
         storeId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
         name:
           type: string
@@ -1033,7 +1028,7 @@ components:
         members:
           type: array
           items:
-            $ref: "#/components/schemas/id"
+            $ref: "./common.yml#/components/schemas/Id"
             description: "Team member ID array"
           description: Team members who can provide the service
         category:
@@ -1059,10 +1054,10 @@ components:
         - hidden
       properties:
         id:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the service
         storeId:
-          $ref: "#/components/schemas/id"
+          $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
         name:
           type: string
@@ -1102,28 +1097,28 @@ components:
       required: true
       description: "Id of the account"
       schema:
-        $ref: "#/components/schemas/id"
+        $ref: "./common.yml#/components/schemas/Id"
     storeId:
       name: storeId
       in: path
       required: true
       description: "Id of the store"
       schema:
-        $ref: "#/components/schemas/id"
+        $ref: "./common.yml#/components/schemas/Id"
     teamId:
       name: teamId
       in: path
       required: true
       description: "Id of a team member"
       schema:
-        $ref: "#/components/schemas/id"
+        $ref: "./common.yml#/components/schemas/Id"
     serviceId:
       name: serviceId
       in: path
       required: true
       description: "Id of the service"
       schema:
-        $ref: "#/components/schemas/id"
+        $ref: "./common.yml#/components/schemas/Id"
     start:
       name: start
       in: query
@@ -1142,11 +1137,10 @@ components:
         type: string
         format: date-time
         example: "2021-01-01T18:00:00Z"
-    search:
-      name: search
-      in: query
-      required: false
-      description: "Search string for filtering"
-      schema:
-        type: string
-        example: "John Doe"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token"

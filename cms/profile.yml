@@ -321,6 +321,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CMSUser"
+  /stores/{storeId}/accounts/many:
+    get:
+      summary: Get Multiple Store User Info
+      description: Get multiple user information by account IDs in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountIds
+              properties:
+                accountIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: Store user information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CMSUser"
 
 components:
   schemas:
