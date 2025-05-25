@@ -156,7 +156,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
   /accounts/many:
-    get:
+    post:
       summary: Get Multiple User Info
       description: Get multiple user information by account IDs
       requestBody:
@@ -322,7 +322,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CMSUser"
   /stores/{storeId}/accounts/many:
-    get:
+    post:
       summary: Get Multiple Store User Info
       description: Get multiple user information by account IDs in a specific store
       parameters:
