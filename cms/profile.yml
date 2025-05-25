@@ -411,18 +411,13 @@ components:
           type: string
           example: ghijkl0987654321
     CMSUser:
-      type: object
       allOf:
         - $ref: "#/components/schemas/User"
-        - required:
+        - type: object
+          required:
             - cmsRole
             - storeId
-        - properties:
-            role:
-              type: number
-              enum:
-                - 2
-              description: Role of the user (2 - CMS)
+          properties:
             cmsRole:
               $ref: "#/components/schemas/CmsRole"
             storeId:

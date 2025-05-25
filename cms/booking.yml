@@ -110,6 +110,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Store"
+  /stores/{storeId}/accounts/{accountId}:
+    get:
+      description: "Get Team based on storeId and accountId"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/accountId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
   /stores/{storeId}/availability:
     get:
       description: "Get availability of a store in a from start time to end time"
@@ -158,6 +173,16 @@ paths:
       responses:
         "201":
           description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the booking
   /stores/{storeId}/services:
     get:
       description: "Get services of a store."
@@ -195,7 +220,6 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name of the team member"
       responses:
         "200":
@@ -303,7 +327,7 @@ paths:
                     items:
                       $ref: "#/components/schemas/Customer"
 
-  /stores/{storeId}/connnection:
+  /stores/{storeId}/connection:
     post:
       description: "Connect a client to a store, (only for Client)"
       tags:
@@ -572,7 +596,6 @@ paths:
         - $ref: "#/components/parameters/serviceId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name of the team member"
       responses:
         "200":
@@ -806,7 +829,7 @@ components:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member
             customer:
-              $ref: "#/components/schemas/CreateCustomer"
+              $ref: "#/components/schemas/Profile"
               description: Booking profile of the customer.
     Book:
       allOf:
@@ -818,6 +841,7 @@ components:
             - team
             - customer
             - status
+            - storeId
           properties:
             id:
               $ref: "./common.yml#/components/schemas/Id"
@@ -904,6 +928,32 @@ components:
           example: "https://example.com/avatar.jpg"
           description: Avatar of the store
 
+    Profile:
+      type: object
+      required:
+        - id
+        - name
+        - phone
+        - email
+      properties:
+        accountId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the customer account. This is optional and can be null if the customer is anonymous.
+        name:
+          type: string
+          example: "John Doe"
+        phone:
+          type: string
+          example: "1234567890"
+        email:
+          type: string
+          example: "abc@gmail.com"
+        address:
+          type: string
+          example: "123, Example Street, City, Country"
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
     CreateCustomer:
       type: object
       required:
