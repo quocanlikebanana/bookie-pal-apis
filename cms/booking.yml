@@ -347,6 +347,32 @@ paths:
         "200":
           description: OK
 
+  /books:
+    get:
+      description: "Get all bookings (depends on the user role)"
+      tags:
+        - Book
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+          description: "Search string for filtering, search by name of the customer or phone number"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - books
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Book"
   /books/{bookId}:
     get:
       description: "Get a booking by id"
