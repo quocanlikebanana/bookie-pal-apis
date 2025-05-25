@@ -876,6 +876,7 @@ components:
       required:
         - start
         - end
+        - notification
       properties:
         start:
           $ref: "./common.yml#/components/schemas/DateTime"
