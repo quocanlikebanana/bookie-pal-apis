@@ -326,6 +326,30 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Customer"
+    post:
+      description: "Create a customer with no account (anonymous) in a store"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCustomer"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the customer in Booking domain (not the account id).
 
   /stores/{storeId}/connection:
     post:
@@ -675,20 +699,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Team"
-
-  /anonymous-customers:
-    post:
-      description: "Create a customer with no account (anonymous)"
-      tags:
-        - Customer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateCustomer"
-      responses:
-        "201":
-          description: Created
 
   /industries:
     get:
