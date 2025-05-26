@@ -717,6 +717,189 @@ paths:
                   example: "Beauty"
                   description: Name of the industry
 
+  /unauth-stores/{storeId}:
+    get:
+      description: "Get a store by id"
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store"
+  /unauth-stores/{storeId}/book:
+    post:
+      description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBook"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the booking
+  /unauth-stores/{storeId}/services:
+    get:
+      description: "Get services of a store."
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+          description: "Search string for filtering, search by name of the service"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - services
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+  /unauth-stores/{storeId}/teams:
+    get:
+      description: "Get team members for a store version 2"
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+          description: "Search string for filtering, search by name of the team member"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - teams
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  teams:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Team"
+
+  /unauth-books/{bookId}:
+    get:
+      description: "Get a booking by id"
+      tags:
+        - Book
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+    put:
+      description: "Update a booking by id"
+      tags:
+        - Book
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBook"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Delete a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      responses:
+        "204":
+          description: No Content
+
+  /unauth-teams/{teamId}/services:
+    get:
+      description: "Get services of a team member in a store"
+      tags:
+        - Team
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /unauth-services/{serviceId}/teams:
+    get:
+      description: "Get team members for a service"
+      tags:
+        - Service
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+          description: "Search string for filtering, search by name of the team member"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  teams:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Team"
+
 components:
   schemas:
     Time:
