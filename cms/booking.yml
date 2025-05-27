@@ -435,19 +435,6 @@ paths:
         "204":
           description: No Content
 
-  /teams:
-    post:
-      description: "Create a team member"
-      tags:
-        - Team
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateTeam"
-      responses:
-        "201":
-          description: Created
   /teams/{teamId}:
     get:
       description: "Get a team member by id"

@@ -256,13 +256,16 @@ paths:
               type: object
               required:
                 - email
-                - role
+                - cmsRole
+                - workHours
               properties:
                 email:
                   type: string
                   format: email
                 cmsRole:
                   $ref: "#/components/schemas/CmsRole"
+                workHours:
+                  $ref: "./booking.yml#/components/schemas/WorkHoursInWeek"
       responses:
         "201":
           description: User invited successfully
