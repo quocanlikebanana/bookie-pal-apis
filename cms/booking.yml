@@ -247,8 +247,6 @@ paths:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
-          description: "Search string for filtering, search by name  or phone number of booked record"
       responses:
         "200":
           description: OK
@@ -296,7 +294,7 @@ paths:
                   customers:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Customer"
+                      $ref: "#/components/schemas/Profile"
   /stores/{storeId}/anonymous-customers:
     get:
       description: "Get customers booked that has no account (accountId is null) (no need to distinct)"
@@ -325,9 +323,9 @@ paths:
                   customers:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Customer"
+                      $ref: "#/components/schemas/Profile"
     post:
-      description: "Create a customer with no account (anonymous) in a store"
+      description: "Create a customer (profile) with no account (anonymous) in a store"
       tags:
         - Store
       parameters:
@@ -336,7 +334,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateCustomer"
+              $ref: "#/components/schemas/CreateProfile"
       responses:
         "201":
           description: Created
@@ -679,6 +677,9 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - pagination
+                  - teams
                 properties:
                   pagination:
                     $ref: "./common.yml#/components/schemas/Pagination"
@@ -1066,6 +1067,7 @@ components:
           required:
             - serviceId
             - teamId
+            - customer
           properties:
             serviceId:
               $ref: "./common.yml#/components/schemas/Id"
@@ -1074,7 +1076,7 @@ components:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member
             customer:
-              $ref: "#/components/schemas/Profile"
+              $ref: "#/components/schemas/CreateProfile"
               description: Booking profile of the customer.
     Book:
       allOf:
@@ -1099,7 +1101,7 @@ components:
             team:
               $ref: "#/components/schemas/Team"
             customer:
-              $ref: "#/components/schemas/Customer"
+              $ref: "#/components/schemas/Profile"
               description: Booking profile of the customer when they have created the booking (has ID).
             status:
               $ref: "#/components/schemas/BookingStatus"
@@ -1174,32 +1176,18 @@ components:
           description: Avatar of the store
 
     Profile:
-      type: object
-      required:
-        - id
-        - name
-        - phone
-        - email
-      properties:
-        accountId:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the customer account. This is optional and can be null if the customer is anonymous.
-        name:
-          type: string
-          example: "John Doe"
-        phone:
-          type: string
-          example: "1234567890"
-        email:
-          type: string
-          example: "abc@gmail.com"
-        address:
-          type: string
-          example: "123, Example Street, City, Country"
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-    CreateCustomer:
+      allOf:
+        - $ref: "#/components/schemas/CreateProfile"
+          description: Profile of the customer with additional fields.
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the customer profile in Booking domain (not the account id).
+
+    CreateProfile:
       type: object
       required:
         - name
@@ -1228,16 +1216,7 @@ components:
         storeId:
           $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
-    Customer:
-      allOf:
-        - $ref: "#/components/schemas/CreateCustomer"
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "./common.yml#/components/schemas/Id"
-              description: Id of the customer in Booking domain (not the account id).
+
     CMSRole:
       type: number
       enum:
@@ -1245,7 +1224,6 @@ components:
         - 2
         - 3
       description: Role of the user (1 - admin, 2 - manager, 3 - employee)
-
     CreateTeam:
       type: object
       required:

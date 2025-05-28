@@ -15,7 +15,7 @@ components:
       name: limit
       in: query
       required: false
-      default: 10
+      default: 100
       description: "Limit number of items per page"
       schema:
         type: integer
