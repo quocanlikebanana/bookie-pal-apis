@@ -377,7 +377,10 @@ paths:
       parameters:
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
-          description: "Search string for filtering, search by name of the customer or phone number"
+        - $ref: "#/components/parameters/storeIdQuery"
+        - $ref: "#/components/parameters/teamIdQuery"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
       responses:
         "200":
           description: OK
@@ -1395,10 +1398,17 @@ components:
       description: "Id of the service"
       schema:
         $ref: "./common.yml#/components/schemas/Id"
+    bookId:
+      name: bookId
+      in: path
+      required: true
+      description: "Id of the booking"
+      schema:
+        $ref: "./common.yml#/components/schemas/Id"
+
     start:
       name: start
       in: query
-      required: true
       description: "Start of the time range in date time"
       schema:
         type: string
@@ -1407,19 +1417,24 @@ components:
     end:
       name: end
       in: query
-      required: true
       description: "End of the time range in date time"
       schema:
         type: string
         format: date-time
         example: "2021-01-01T18:00:00Z"
-    bookId:
-      name: bookId
-      in: path
-      required: true
-      description: "Id of the booking"
+    storeIdQuery:
+      name: storeId
+      in: query
+      description: "Id of the store"
       schema:
         $ref: "./common.yml#/components/schemas/Id"
+    teamIdQuery:
+      name: teamId
+      in: query
+      description: "Id of the team member"
+      schema:
+        $ref: "./common.yml#/components/schemas/Id"
+
   securitySchemes:
     BearerAuth:
       type: http
