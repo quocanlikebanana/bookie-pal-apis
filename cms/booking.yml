@@ -509,17 +509,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  required:
-                    - fromDate
-                    - toDate
-                  properties:
-                    fromDate:
-                      $ref: "./common.yml#/components/schemas/DateTime"
-                      description: Start date of the time off
-                    toDate:
-                      $ref: "./common.yml#/components/schemas/DateTime"
-                      description: End date of the time off
+                  $ref: "#/components/schemas/TimeOff"
     post:
       description: "Create a time off for a team member in a store"
       tags:
@@ -530,15 +520,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - start
-                - end
-              properties:
-                fromDate:
-                  $ref: "./common.yml#/components/schemas/DateTime"
-                toDate:
-                  $ref: "./common.yml#/components/schemas/DateTime"
+              $ref: "#/components/schemas/CreateTimeOff"
       responses:
         "201":
           description: Created
@@ -556,7 +538,7 @@ paths:
               required:
                 - teamTimeOffId
               properties:
-                teamTimeOffId:
+                timeOffId:
                   $ref: "./common.yml#/components/schemas/Id"
                   description: Id of the time off to be deleted of the team
       responses:
@@ -1189,7 +1171,6 @@ components:
             id:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the customer profile in Booking domain (not the account id).
-
     CreateProfile:
       type: object
       required:
@@ -1255,6 +1236,32 @@ components:
             id:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member in Booking domain (not the account id).
+    CreateTimeOff:
+      type: object
+      required:
+        - fromDate
+        - toDate
+      properties:
+        fromDate:
+          $ref: "./common.yml#/components/schemas/DateTime"
+          description: Start date of the time off
+        toDate:
+          $ref: "./common.yml#/components/schemas/DateTime"
+          description: End date of the time off
+    TimeOff:
+      allOf:
+        - $ref: "#/components/schemas/CreateTimeOff"
+        - type: object
+          required:
+            - id
+            - teamId
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the time off in Booking domain (not the account id).
+            teamId:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the team member
 
     SMSAccount:
       type: object
