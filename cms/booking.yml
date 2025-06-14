@@ -873,6 +873,35 @@ paths:
                     items:
                       $ref: "#/components/schemas/Team"
 
+  /v2/profiles:
+    get:
+      description: "Get all profiles of the store (booked customers with accountId)"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/storeIdQuery"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+          description: "Search string for filtering, search by name or phone number of the profile"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - profiles
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  profiles:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Profile"
+
 components:
   schemas:
     Time:
