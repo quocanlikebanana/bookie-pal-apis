@@ -240,7 +240,7 @@ paths:
                       $ref: "#/components/schemas/Team"
   /stores/{storeId}/customers:
     get:
-      description: "Get customers booked that has account (customers version 2)"
+      description: "Get customers booked that has account."
       tags:
         - Store
       parameters:
@@ -1188,6 +1188,10 @@ components:
           type: string
           example: "https://example.com/avatar.jpg"
           description: Avatar of the store
+        minutesChunk:
+          type: integer
+          example: 15
+          description: Minutes chunk for the store (default is 15 minutes)
 
     Profile:
       allOf:
