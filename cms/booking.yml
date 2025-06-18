@@ -705,6 +705,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Store"
+
+  /unauth-stores/{storeId}/accounts/{accountId}:
+    get:
+      description: "Get Team based on storeId and accountId"
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/accountId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+
   /unauth-stores/{storeId}/book:
     post:
       description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
@@ -862,6 +880,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Team"
+
+  /unauth-teams/{teamId}/availability:
+    get:
+      description: "Get availability of a team member in a store in time range"
+      tags:
+        - Team
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Availability"
 
   /unauth-services/{serviceId}/teams:
     get:
