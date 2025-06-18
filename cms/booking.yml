@@ -847,6 +847,22 @@ paths:
                 items:
                   $ref: "#/components/schemas/Service"
 
+  /unauth-teams/{teamId}:
+    get:
+      description: "Get a team member by id"
+      tags:
+        - Team
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+
   /unauth-services/{serviceId}/teams:
     get:
       description: "Get team members for a service"
