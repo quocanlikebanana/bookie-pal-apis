@@ -1,0 +1,267 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "proto/api/api.proto",
+		"version": "1.0"
+	},
+	"tags": [
+		{
+			"name": "ReviewService"
+		}
+	],
+	"paths": {
+		"/review": {
+			"post": {
+				"operationId": "ReviewService_CreateReview",
+				"responses": {
+					"200": {
+						"description": "A successful response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/genCreateReviewResponse"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An unexpected error response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/rpcStatus"
+								}
+							}
+						}
+					}
+				},
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/genCreateReviewRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"tags": [
+					"ReviewService"
+				]
+			}
+		},
+		"/review/list": {
+			"get": {
+				"operationId": "ReviewService_ListReviews",
+				"responses": {
+					"200": {
+						"description": "A successful response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/genListReviewsResponse"
+								}
+							}
+						}
+					},
+					"default": {
+						"description": "An unexpected error response.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/rpcStatus"
+								}
+							}
+						}
+					}
+				},
+				"parameters": [
+					{
+						"name": "storeId",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "pageIndex",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					},
+					{
+						"name": "pageSize",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"tags": [
+					"ReviewService"
+				]
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"genCreateReviewRequest": {
+				"type": "object",
+				"properties": {
+					"storeId": {
+						"type": "string"
+					},
+					"parentId": {
+						"type": "string",
+						"format": "uint64"
+					},
+					"rating": {
+						"type": "number",
+						"format": "float"
+					},
+					"content": {
+						"type": "string"
+					}
+				}
+			},
+			"genCreateReviewResponse": {
+				"type": "object",
+				"properties": {
+					"review": {
+						"$ref": "#/components/schemas/genReview"
+					}
+				}
+			},
+			"genListReviewsRequest": {
+				"type": "object",
+				"properties": {
+					"storeId": {
+						"type": "string"
+					},
+					"sortMethods": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/genSortMethod"
+						}
+					},
+					"pageIndex": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"pageSize": {
+						"type": "integer",
+						"format": "int32"
+					}
+				}
+			},
+			"genListReviewsResponse": {
+				"type": "object",
+				"properties": {
+					"reviews": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/genReview"
+						}
+					},
+					"totalCount": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"totalPages": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"request": {
+						"$ref": "#/components/schemas/genListReviewsRequest"
+					}
+				}
+			},
+			"genReview": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"format": "uint64"
+					},
+					"content": {
+						"type": "string"
+					},
+					"totalLikes": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"totalDislikes": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"rating": {
+						"type": "number",
+						"format": "float"
+					},
+					"children": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/genReview"
+						}
+					},
+					"customerId": {
+						"type": "string"
+					}
+				}
+			},
+			"genSortMethod": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"$ref": "#/components/schemas/genSortType"
+					}
+				}
+			},
+			"genSortType": {
+				"type": "string",
+				"enum": [
+					"SORT_TYPE_UNKNOWN",
+					"SORT_TYPE_ASC",
+					"SORT_TYPE_DESC"
+				],
+				"default": "SORT_TYPE_UNKNOWN"
+			},
+			"protobufAny": {
+				"type": "object",
+				"properties": {
+					"@type": {
+						"type": "string"
+					}
+				},
+				"additionalProperties": {}
+			},
+			"rpcStatus": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"message": {
+						"type": "string"
+					},
+					"details": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/protobufAny"
+						}
+					}
+				}
+			}
+		}
+	}
+}
