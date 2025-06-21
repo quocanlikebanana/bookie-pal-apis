@@ -83,19 +83,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Store"
-    post:
-      description: "Create a store"
-      tags:
-        - Store
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Store"
-
-      responses:
-        "201":
-          description: Created
   /stores/{storeId}:
     get:
       description: "Get a store by id"
@@ -110,6 +97,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Store"
+    put:
+      description: "Update a store by id"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CreateStore"
+                - type: object
+                  properties:
+                    avatar:
+                      type: string
+                      description: "Avatar File of the store"
+      responses:
+        "200":
+          description: OK
   /stores/{storeId}/accounts/{accountId}:
     get:
       description: "Get Team based on storeId and accountId"
@@ -1195,10 +1202,9 @@ components:
           description: Send SMS notification
           example: true
 
-    Store:
+    CreateStore:
       type: object
       required:
-        - id
         - adminId
         - name
         - description
@@ -1207,8 +1213,6 @@ components:
         - phone
         - timezone
       properties:
-        id:
-          $ref: "./common.yml#/components/schemas/Id"
         adminId:
           $ref: "./common.yml#/components/schemas/Id"
           description: Id of the admin account
@@ -1236,14 +1240,33 @@ components:
           type: string
           example: "Asia/Kolkata"
           description: Timezone of the store
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the store
         minutesChunk:
           type: integer
           example: 15
           description: Minutes chunk for the store (default is 15 minutes)
+    Store:
+      allOf:
+        - $ref: "#/components/schemas/CreateStore"
+        - type: object
+          required:
+            - id
+            - createdAt
+            - updatedAt
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the store
+            avatar:
+              type: string
+              format: uri
+              example: "https://example.com/avatar.jpg"
+              description: URL of the store avatar
+            createdAt:
+              $ref: "./common.yml#/components/schemas/DateTime"
+              description: Creation date of the store
+            updatedAt:
+              $ref: "./common.yml#/components/schemas/DateTime"
+              description: Last update date of the store
 
     Profile:
       allOf:
@@ -1408,8 +1431,7 @@ components:
           description: Category of the service
         avatar:
           type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the service
+          description: Avatar of the service (File)
         hidden:
           type: boolean
           example: false

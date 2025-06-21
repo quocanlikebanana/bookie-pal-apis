@@ -57,7 +57,7 @@ paths:
                   type: string
                 avatar:
                   type: string
-                  format: uri
+                  description: User avatar image (File upload)
       responses:
         "201":
           $ref: "#/components/responses/AuthResponse"
@@ -238,7 +238,7 @@ paths:
                   type: string
                 avatar:
                   type: string
-                  format: uri
+                  description: User avatar image (File upload)
       responses:
         "201":
           $ref: "#/components/responses/CMSAuthResponse"
@@ -370,6 +370,7 @@ components:
         - 2
         - 3
       description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+
     User:
       type: object
       required:
