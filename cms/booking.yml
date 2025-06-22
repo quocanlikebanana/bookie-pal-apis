@@ -386,6 +386,8 @@ paths:
         - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "#/components/parameters/storeIdQuery"
         - $ref: "#/components/parameters/teamIdQuery"
+        - $ref: "#/components/parameters/accountIdQuery"
+        - $ref: "#/components/parameters/serviceIdQuery"
         - $ref: "#/components/parameters/start"
         - $ref: "#/components/parameters/end"
       responses:
@@ -442,6 +444,26 @@ paths:
       responses:
         "204":
           description: No Content
+  /books/{bookId}/status:
+    patch:
+      description: "Update status of a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: "#/components/schemas/BookingStatus"
+      responses:
+        "200":
+          description: OK
 
   /teams/{teamId}:
     get:
@@ -1546,6 +1568,18 @@ components:
       name: teamId
       in: query
       description: "Id of the team member"
+      schema:
+        $ref: "./common.yml#/components/schemas/Id"
+    serviceIdQuery:
+      name: serviceId
+      in: query
+      description: "Id of the service"
+      schema:
+        $ref: "./common.yml#/components/schemas/Id"
+    accountIdQuery:
+      name: accountId
+      in: query
+      description: "Id of the account"
       schema:
         $ref: "./common.yml#/components/schemas/Id"
 

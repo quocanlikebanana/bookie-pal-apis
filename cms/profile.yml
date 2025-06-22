@@ -258,6 +258,7 @@ paths:
                 - email
                 - cmsRole
                 - workHours
+                - redirectUrl
               properties:
                 email:
                   type: string
@@ -266,6 +267,10 @@ paths:
                   $ref: "#/components/schemas/CmsRole"
                 workHours:
                   $ref: "./booking.yml#/components/schemas/WorkHoursInWeek"
+                redirectUrl:
+                  type: string
+                  format: uri
+                  description: URL to redirect after email confirmation
       responses:
         "201":
           description: User invited successfully
