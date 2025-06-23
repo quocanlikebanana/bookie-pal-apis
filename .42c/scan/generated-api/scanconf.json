@@ -1,0 +1,661 @@
+{
+    "version": "2.0.0",
+    "runtimeConfiguration": {
+        "environment": "default",
+        "laxTestingModeEnabled": false,
+        "apiConnectivityCheck": true,
+        "logLevel": "error",
+        "logDestination": "stdout+platform",
+        "logMaxFileSize": 2147483648,
+        "requestHeaderNameRequestId": "x-scan-request-id",
+        "requestHeaderNameScenarioId": "x-scan-scenario-id",
+        "requestHeaderNameRequestType": "x-scan-request-type",
+        "requestFlowrate": 100,
+        "requestTimeout": 30,
+        "requestTlsInsecureSkipVerify": true,
+        "responseFollowRedirection": false,
+        "responseMaxBodySizeScan": 10485760,
+        "happyPathOnly": false,
+        "maxRequestRetryAttempts": 5,
+        "maxScanDuration": 1800,
+        "memoryLimit": 2147483648,
+        "memoryTimeSpan": 10,
+        "reportMaxRequestSizeHappyPath": 8092,
+        "reportMaxRequestSizeTest": 8092,
+        "reportIncludeRequestBody": true,
+        "reportIncludeResponseBody": true,
+        "reportMaxHttpResponseSizeHappyPath": 8092,
+        "reportMaxBodySizeHappyPath": 8092,
+        "reportMaxHttpResponseSizeTest": 8092,
+        "reportMaxBodySizeTest": 8092,
+        "reportIssuesOnly": false,
+        "reportMaxIssues": 1000,
+        "reportMaxSize": 20971520,
+        "reportGenerateCurlCommand": true
+    },
+    "customizations": {
+        "happyPaths": {
+            "retry": 1,
+            "responsePolicy": {
+                "httpStatusExpected": true,
+                "mustBeConformant": true
+            },
+            "httpStatusExpected": []
+        },
+        "tests": {
+            "responsePolicy": {
+                "httpStatusExpected": true,
+                "mustBeConformant": true
+            }
+        }
+    },
+    "authenticationDetails": [
+        {
+            "BearerAuth": {
+                "type": "bearer",
+                "default": "BearerAuth",
+                "credentials": {
+                    "BearerAuth": {
+                        "description": "BearerAuth security",
+                        "credential": "{{BearerAuth}}"
+                    }
+                }
+            }
+        }
+    ],
+    "operations": {
+        "Messaging_AddSmsAccount": {
+            "operationId": "Messaging_AddSmsAccount",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_AddSmsAccount/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_AddSmsAccount",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/account/add",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "name": "",
+                                "smsAccount": "",
+                                "smsPassword": "",
+                                "storeId": ""
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        },
+        "Messaging_DeleteSmsAccount": {
+            "operationId": "Messaging_DeleteSmsAccount",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_DeleteSmsAccount/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_DeleteSmsAccount",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/account/delete",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "accountId": 0,
+                                "storeId": ""
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        },
+        "Messaging_ListMessages": {
+            "operationId": "Messaging_ListMessages",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_ListMessages/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_ListMessages",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/messages/list",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "storeId": ""
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        },
+        "Messaging_ListSmsAccount": {
+            "operationId": "Messaging_ListSmsAccount",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_ListSmsAccount/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_ListSmsAccount",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/account/list",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "pageIndex": 3318313357534501037,
+                                "pageSize": 2188475693549991524,
+                                "sort": [
+                                    {
+                                        "name": "",
+                                        "type": "SORT_TYPE_UNKNOWN"
+                                    },
+                                    {
+                                        "name": "",
+                                        "type": "SORT_TYPE_UNKNOWN"
+                                    },
+                                    {
+                                        "name": "",
+                                        "type": "SORT_TYPE_UNKNOWN"
+                                    }
+                                ],
+                                "storeId": "hpqexsqaxcpwfretzfgavihfquqxbczd"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        },
+        "Messaging_SendSms": {
+            "operationId": "Messaging_SendSms",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_SendSms/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_SendSms",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/sms/send",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "encrypt": true,
+                                "message": "rqxghpsnzmtryhjvzauaqajlikajuovs",
+                                "phoneNumbers": [
+                                    "jduuxyjuxdpvnerxcrrbdbwumzvcknxe",
+                                    "sdomcndpkjcqobubjlkggffuclhjjcpl",
+                                    "atoqkductkpnueyndhpzlgvdusjjbrev"
+                                ],
+                                "storeId": "rjnjmtsiwtgjsbcpeuaqkcidmkizsfgu"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        },
+        "Messaging_UpdateListSmsAccount": {
+            "operationId": "Messaging_UpdateListSmsAccount",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_UpdateListSmsAccount/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_UpdateListSmsAccount",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/account/update_list",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "accounts": [
+                                    {
+                                        "account": "jbpanaximweiagjrqrfibsdduopapzmc",
+                                        "createdAt": 3170981693914602672,
+                                        "devices": [
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            },
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            },
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            }
+                                        ],
+                                        "id": 427843529564406837,
+                                        "name": "bclmvjgwkjoelktnxlepukbmnvluftqw",
+                                        "storeId": "inzrszhyoqvdbqtzqcfjcowwvhrlqujj",
+                                        "updatedAt": 393466361705130703
+                                    },
+                                    {
+                                        "account": "orwnefenkmnbevsrtcninuhycuzllwsb",
+                                        "createdAt": 7302049194253580956,
+                                        "devices": [
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            }
+                                        ],
+                                        "id": 3095701568927936706,
+                                        "name": "bgjwspwounylyikjqmjokxmeummjkngy",
+                                        "storeId": "xxrknnylutiqwsjxssbotwnlwvfcvlnu",
+                                        "updatedAt": 4985705224091846837
+                                    },
+                                    {
+                                        "account": "iuldvybpzqwnmyegavjnbgkrnwmmaxpu",
+                                        "createdAt": 860152165484113140,
+                                        "devices": [
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            },
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            },
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            }
+                                        ],
+                                        "id": 15477258842235194,
+                                        "name": "rvlmxkmdivfrtgsiuarvhgekelwxafbd",
+                                        "storeId": "yclgcnakzknxfipttiqerabnzyjjhtop",
+                                        "updatedAt": 7461358163345712301
+                                    },
+                                    {
+                                        "account": "iaviqaoktyxvdetogtxpbmdaxejterbo",
+                                        "createdAt": 6527432330303838851,
+                                        "devices": [
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            },
+                                            {
+                                                "createdAt": 1741589979,
+                                                "id": "",
+                                                "isAvailable": true,
+                                                "name": "",
+                                                "updatedAt": 1741589979
+                                            }
+                                        ],
+                                        "id": 5478147696268073366,
+                                        "name": "fevgsyuuiacmjlqhsmwrmonsidwhsdnh",
+                                        "storeId": "bpwovxffmxfbvicnaenmmuiyozahrbep",
+                                        "updatedAt": 6113087018449744850
+                                    }
+                                ],
+                                "storeId": "ogkqmgonjklfymmiwelcukubeekznfyh"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        },
+        "Messaging_UpdateOrderIndex": {
+            "operationId": "Messaging_UpdateOrderIndex",
+            "scenarios": [
+                {
+                    "key": "happy.path",
+                    "fuzzing": true,
+                    "requests": [
+                        {
+                            "$ref": "#/operations/Messaging_UpdateOrderIndex/request",
+                            "fuzzing": true
+                        }
+                    ]
+                }
+            ],
+            "request": {
+                "operationId": "Messaging_UpdateOrderIndex",
+                "auth": [
+                    "BearerAuth"
+                ],
+                "request": {
+                    "type": "42c",
+                    "details": {
+                        "url": "{{host}}/messaging/account/update_order_index",
+                        "method": "POST",
+                        "headers": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "requestBody": {
+                            "mode": "json",
+                            "json": {
+                                "accountIds": [
+                                    4494161884984639989,
+                                    8015067899047949758
+                                ],
+                                "storeId": "cjpaiaavaqwnbduacmvyetoxdiyrgwpl"
+                            }
+                        }
+                    }
+                },
+                "defaultResponse": "200",
+                "responses": {
+                    "200": {
+                        "expectations": {
+                            "httpStatus": 200
+                        }
+                    },
+                    "400": {
+                        "expectations": {
+                            "httpStatus": 400
+                        }
+                    },
+                    "401": {
+                        "expectations": {
+                            "httpStatus": 401
+                        }
+                    },
+                    "500": {
+                        "expectations": {
+                            "httpStatus": 500
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "environments": {
+        "default": {
+            "variables": {
+                "BearerAuth": {
+                    "from": "environment",
+                    "name": "SCAN42C_SECURITY_BEARERAUTH",
+                    "required": true
+                },
+                "host": {
+                    "from": "environment",
+                    "name": "SCAN42C_HOST",
+                    "required": true
+                }
+            }
+        }
+    }
+}

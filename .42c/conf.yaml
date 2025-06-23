@@ -1,0 +1,3 @@
+apis:
+  cms/messaging.yml:
+    alias: generated-api
