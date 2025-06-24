@@ -176,7 +176,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateBook"
+              allOf:
+                - $ref: "#/components/schemas/CreateBook"
+                - type: object
+                  properties:
+                    redirectUrl:
+                      type: string
+                      description: "Redirect URL after booking is created, if not provided, it will be null"
       responses:
         "201":
           description: Created
@@ -519,7 +525,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WorkHoursInWeek"
+              type: object
+              required:
+                - workHours
+              properties:
+                workHours:
+                  $ref: "#/components/schemas/WorkHoursInWeek"
       responses:
         "200":
           description: OK
@@ -1205,7 +1216,7 @@ components:
       enum:
         - new
         - ready
-        - denined
+        - denied
         - done
       example: "new"
       description: Status of the booking.

@@ -359,6 +359,38 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CMSUser"
+  /reset-password:
+    post:
+      summary: Reset Password
+      description: Reset user password using special reset code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - newPassword
+              properties:
+                code:
+                  type: string
+                  description: Special reset code sent to the user's email
+                newPassword:
+                  type: string
+                  description: New password for the user
+      responses:
+        "201":
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successfully"
 
 components:
   schemas:
