@@ -10,7 +10,7 @@
 		}
 	],
 	"paths": {
-		"/review": {
+		"/review/create": {
 			"post": {
 				"operationId": "ReviewService_CreateReview",
 				"responses": {

@@ -396,6 +396,8 @@ paths:
         - $ref: "#/components/parameters/serviceIdQuery"
         - $ref: "#/components/parameters/start"
         - $ref: "#/components/parameters/end"
+        - $ref: "#/components/parameters/bookingStatusFilterQuery"
+          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
       responses:
         "200":
           description: OK
@@ -1593,6 +1595,14 @@ components:
       description: "Id of the account"
       schema:
         $ref: "./common.yml#/components/schemas/Id"
+    bookingStatusFilterQuery:
+      name: status
+      in: query
+      description: "Filter bookings by status"
+      schema:
+        type: array
+        items:
+          $ref: "#/components/schemas/BookingStatus"
 
   securitySchemes:
     BearerAuth:
