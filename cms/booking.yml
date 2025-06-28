@@ -995,6 +995,67 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Profile"
+    post:
+      description: "Create a profile of the store (booked customers with accountId)"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfile"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the profile in Booking domain (not the account id).
+  /v2/profiles/{profileId}:
+    get:
+      description: "Get a profile by id"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/profileId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+    put:
+      description: "Update a profile by id"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/profileId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfile"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Delete a profile by id"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/profileId"
+      responses:
+        "204":
+          description: No Content
 
 components:
   schemas:
@@ -1552,6 +1613,13 @@ components:
       in: path
       required: true
       description: "Id of the booking"
+      schema:
+        $ref: "./common.yml#/components/schemas/Id"
+    profileId:
+      name: profileId
+      in: path
+      required: true
+      description: "Id of the profile"
       schema:
         $ref: "./common.yml#/components/schemas/Id"
 
