@@ -974,6 +974,7 @@ paths:
         - Profile
       parameters:
         - $ref: "#/components/parameters/storeIdQuery"
+        - $ref: "#/components/parameters/hasAccountQuery"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "./common.yml#/components/parameters/search"
@@ -999,8 +1000,6 @@ paths:
       description: "Create a profile of the store (booked customers with accountId)"
       tags:
         - Profile
-      parameters:
-        - $ref: "#/components/parameters/storeId"
       requestBody:
         content:
           application/json:
@@ -1210,7 +1209,13 @@ components:
               end:
                 hour: 18
                 minute: 0
-
+    BooleanQuery:
+      type: string
+      enum:
+        - "1"
+        - "0"
+      example: "1"
+      description: Boolean query parameter for filtering, can be used in queries like ?email=1&sms=0
     BookBase:
       type: object
       required:
@@ -1671,6 +1676,12 @@ components:
         type: array
         items:
           $ref: "#/components/schemas/BookingStatus"
+    hasAccountQuery:
+      name: hasAccount
+      in: query
+      description: "Filter profiles by whether they have an account or not"
+      schema:
+        $ref: "#/components/schemas/BooleanQuery"
 
   securitySchemes:
     BearerAuth:
