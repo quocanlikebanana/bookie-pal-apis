@@ -259,13 +259,20 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/CMSAuthResponse"
-  /stores/{storeId}/register:
+  /stores/{storeId}/register/{inviteCode}:
     post:
       summary: Store Register
       description: Register a new user in the store after the invitation
       security: []
       parameters:
         - $ref: "#/components/parameters/StoreId"
+        - name: inviteCode
+          in: path
+          required: true
+          description: Invitation code for the store
+          schema:
+            type: string
+            example: "INVITE1234"
       requestBody:
         required: true
         content:
