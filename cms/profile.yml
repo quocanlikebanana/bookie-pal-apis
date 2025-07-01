@@ -30,6 +30,26 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/AuthResponse"
+  /google:
+    post:
+      summary: Google Login
+      description: Login to the system using Google OAuth
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Google OAuth token
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse"
   /register:
     post:
       summary: Register
@@ -151,6 +171,37 @@ paths:
       responses:
         "200":
           description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    put:
+      summary: Update User Info
+      description: Update user information by account ID
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                address:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "200":
+          description: User information updated successfully
           content:
             application/json:
               schema:

@@ -1380,6 +1380,15 @@ components:
             id:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the customer profile in Booking domain (not the account id).
+            _aggregate:
+              type: object
+              description: Aggregate data for the customer profile, such as total bookings, etc.
+              properties:
+                bookingCount:
+                  type: integer
+                  example: 10
+                  description: Total number of bookings made by the customer
+
     CreateProfile:
       type: object
       required:
