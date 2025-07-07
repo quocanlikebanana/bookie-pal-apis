@@ -201,6 +201,7 @@ paths:
       description: "Get services of a store."
       tags:
         - Store
+        - Service
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
@@ -229,6 +230,7 @@ paths:
       description: "Get team members for a store version 2"
       tags:
         - Store
+        - Team
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "./common.yml#/components/parameters/page"
@@ -283,7 +285,7 @@ paths:
       description: "Get all booked profile(s) of the customer of the store by accountId"
       tags:
         - Store
-        - Upgrade
+        - Customer
       parameters:
         - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/accountId"
@@ -692,6 +694,7 @@ paths:
       description: "Get team members for a service"
       tags:
         - Service
+        - Team
       parameters:
         - $ref: "#/components/parameters/serviceId"
         - $ref: "./common.yml#/components/parameters/page"
