@@ -297,6 +297,9 @@ paths:
                 avatar:
                   type: string
                   description: User avatar image (File upload)
+                timezone:
+                  type: string
+                  description: Timezone of the user
       responses:
         "201":
           $ref: "#/components/responses/CMSAuthResponse"
