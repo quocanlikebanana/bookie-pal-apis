@@ -697,6 +697,8 @@ paths:
         - Team
       parameters:
         - $ref: "#/components/parameters/serviceId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
           description: "Search string for filtering, search by name of the team member"

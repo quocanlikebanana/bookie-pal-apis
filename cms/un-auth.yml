@@ -1,0 +1,606 @@
+openapi: "3.0.3"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: https://api.server.test/v1
+security:
+  - BearerAuth: []
+
+paths:
+  /login:
+    post:
+      summary: Login
+      description: Login to the system
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse"
+  /google:
+    post:
+      summary: Google Login
+      description: Login to the system using Google OAuth
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Google OAuth token
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse"
+  /register:
+    post:
+      summary: Register
+      description: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponse"
+  /logout:
+    post:
+      summary: Logout
+      description: Logout from the system (invalidate token in header)
+      responses:
+        "200":
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+  /refresh:
+    post:
+      summary: Refresh Token
+      description: Refresh the access token using the refresh token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                properties:
+                  token:
+                    $ref: "#/components/schemas/TokenAuth"
+  /accounts:
+    get:
+      summary: Get users information
+      parameters:
+        - name: search
+          in: query
+          description: Search by name
+          required: false
+          schema:
+            type: string
+            example: John
+        - name: role
+          in: query
+          description: Filter by role (1 - Client, 2 - CMS)
+          required: false
+          schema:
+            type: number
+            enum:
+              - 1
+              - 2
+            example: 1
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  accounts:
+                    type: array
+                    description: List of user information
+                    items:
+                      $ref: "#/components/schemas/User"
+  /accounts/{accountId}:
+    get:
+      summary: Get User Info
+      description: Get user information by account ID
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+    put:
+      summary: Update User Info
+      description: Update user information by account ID
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                address:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "200":
+          description: User information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /accounts/many:
+    post:
+      summary: Get Multiple User Info
+      description: Get multiple user information by account IDs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountIds
+              properties:
+                accountIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /stores/{storeId}/login:
+    post:
+      summary: Store Login
+      description: Login to the system with store ID
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/CMSAuthResponse"
+  /stores/{storeId}/register/{inviteCode}:
+    post:
+      summary: Store Register
+      description: Register a new user in the store after the invitation
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - name: inviteCode
+          in: path
+          required: true
+          description: Invitation code for the store
+          schema:
+            type: string
+            example: "INVITE1234"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+                timezone:
+                  type: string
+                  description: Timezone of the user
+      responses:
+        "201":
+          $ref: "#/components/responses/CMSAuthResponse"
+  /stores/{storeId}/invite:
+    post:
+      summary: Store Invite
+      description: Invite a user to the store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - cmsRole
+                - workHours
+                - redirectUrl
+              properties:
+                email:
+                  type: string
+                  format: email
+                cmsRole:
+                  $ref: "#/components/schemas/CmsRole"
+                workHours:
+                  $ref: "./booking.yml#/components/schemas/WorkHoursInWeek"
+                redirectUrl:
+                  type: string
+                  format: uri
+                  description: URL to redirect after email confirmation
+      responses:
+        "201":
+          description: User invited successfully
+  /stores/{storeId}/accounts:
+    get:
+      summary: Get Store accounts
+      description: Get accounts of a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - name: search
+          in: query
+          description: Search by name
+          required: false
+          schema:
+            type: string
+            example: John
+        - name: role
+          in: query
+          description: Filter by role (1 - Admin, 2 - Manager, 3 - Employee)
+          required: false
+          schema:
+            type: number
+            enum:
+              - 1
+              - 2
+              - 3
+            example: 1
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+      responses:
+        "200":
+          description: Store users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  accounts:
+                    type: array
+                    description: List of store users information
+                    items:
+                      $ref: "#/components/schemas/CMSUser"
+  /stores/{storeId}/accounts/{accountId}:
+    get:
+      summary: Get Store User Info
+      description: Get user information by account ID in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: Store user information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CMSUser"
+  /stores/{storeId}/accounts/{accountId}/avatar:
+    put:
+      summary: Update Store User Avatar
+      description: Update the avatar of a user in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  description: "Avatar File of the user"
+      responses:
+        "200":
+          description: Store user avatar updated successfully
+  /stores/{storeId}/accounts/many:
+    post:
+      summary: Get Multiple Store User Info
+      description: Get multiple user information by account IDs in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountIds
+              properties:
+                accountIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: Store user information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CMSUser"
+  /reset-password:
+    post:
+      summary: Reset Password
+      description: Reset user password using special reset code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - newPassword
+              properties:
+                code:
+                  type: string
+                  description: Special reset code sent to the user's email
+                newPassword:
+                  type: string
+                  description: New password for the user
+      responses:
+        "201":
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successfully"
+
+components:
+  schemas:
+    Role:
+      type: number
+      enum:
+        - 1
+        - 2
+      description: Role of the user (1 - Client, 2 - CMS)
+    CmsRole:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+      description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+
+    User:
+      type: object
+      required:
+        - accountId
+        - role
+        - name
+        - phone
+        - email
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: John Doe
+        role:
+          $ref: "#/components/schemas/Role"
+        phone:
+          type: string
+          example: +1234567890
+        email:
+          type: string
+          example: johndoe@gmail.com
+          format: email
+        address:
+          type: string
+          example: 123 Main St, City, Country
+        avatar:
+          type: string
+          example: https://example.com/avatar.jpg
+    TokenAuth:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          example: abcdef1234567890
+        refreshToken:
+          type: string
+          example: ghijkl0987654321
+    CMSUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          required:
+            - cmsRole
+            - storeId
+          properties:
+            cmsRole:
+              $ref: "#/components/schemas/CmsRole"
+            storeId:
+              type: string
+              format: uuid
+              example: 123e4567-e89b-12d3-a456-426614174000
+
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: Account ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+    StoreId:
+      name: storeId
+      in: path
+      required: true
+      description: Store ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+
+  responses:
+    AuthResponse:
+      description: Successful login response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/User"
+              token:
+                $ref: "#/components/schemas/TokenAuth"
+    CMSAuthResponse:
+      description: Successful CMS login response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/CMSUser"
+              token:
+                $ref: "#/components/schemas/TokenAuth"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
