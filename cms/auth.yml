@@ -81,21 +81,6 @@ paths:
       responses:
         "201":
           $ref: "#/components/responses/AuthResponse"
-  /logout:
-    post:
-      summary: Logout
-      description: Logout from the system (invalidate token in header)
-      responses:
-        "200":
-          description: Successful logout
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Logged out successfully"
   /refresh:
     post:
       summary: Refresh Token
@@ -124,44 +109,6 @@ paths:
                 properties:
                   token:
                     $ref: "#/components/schemas/TokenAuth"
-  /accounts:
-    get:
-      summary: Get users information
-      parameters:
-        - name: search
-          in: query
-          description: Search by name
-          required: false
-          schema:
-            type: string
-            example: John
-        - name: role
-          in: query
-          description: Filter by role (1 - Client, 2 - CMS)
-          required: false
-          schema:
-            type: number
-            enum:
-              - 1
-              - 2
-            example: 1
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-      responses:
-        "200":
-          description: User information retrieved successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  accounts:
-                    type: array
-                    description: List of user information
-                    items:
-                      $ref: "#/components/schemas/User"
   /accounts/{accountId}:
     get:
       summary: Get User Info
@@ -171,37 +118,6 @@ paths:
       responses:
         "200":
           description: User information retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-    put:
-      summary: Update User Info
-      description: Update user information by account ID
-      parameters:
-        - $ref: "#/components/parameters/AccountId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                phone:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                address:
-                  type: string
-                avatar:
-                  type: string
-                  description: User avatar image (File upload)
-      responses:
-        "200":
-          description: User information updated successfully
           content:
             application/json:
               schema:
@@ -303,38 +219,6 @@ paths:
       responses:
         "201":
           $ref: "#/components/responses/CMSAuthResponse"
-  /stores/{storeId}/invite:
-    post:
-      summary: Store Invite
-      description: Invite a user to the store
-      parameters:
-        - $ref: "#/components/parameters/StoreId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - cmsRole
-                - workHours
-                - redirectUrl
-              properties:
-                email:
-                  type: string
-                  format: email
-                cmsRole:
-                  $ref: "#/components/schemas/CmsRole"
-                workHours:
-                  $ref: "./booking.yml#/components/schemas/WorkHoursInWeek"
-                redirectUrl:
-                  type: string
-                  format: uri
-                  description: URL to redirect after email confirmation
-      responses:
-        "201":
-          description: User invited successfully
   /stores/{storeId}/accounts:
     get:
       summary: Get Store accounts
@@ -390,28 +274,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CMSUser"
-  /stores/{storeId}/accounts/{accountId}/avatar:
-    put:
-      summary: Update Store User Avatar
-      description: Update the avatar of a user in a specific store
-      parameters:
-        - $ref: "#/components/parameters/StoreId"
-        - $ref: "#/components/parameters/AccountId"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - avatar
-              properties:
-                avatar:
-                  type: string
-                  description: "Avatar File of the user"
-      responses:
-        "200":
-          description: Store user avatar updated successfully
   /stores/{storeId}/accounts/many:
     post:
       summary: Get Multiple Store User Info
