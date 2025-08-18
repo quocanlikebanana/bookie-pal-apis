@@ -134,7 +134,7 @@ paths:
                 $ref: "#/components/schemas/Team"
   /stores/{storeId}/availability:
     get:
-      description: "Get availability of a store in a from start time to end time"
+      description: "Get availability of a store in a time range (all team members)"
       tags:
         - Store
       parameters:
@@ -147,8 +147,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Availability"
-  /stores/{storeId}/book:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    teamId:
+                      type: string
+                      format: uuid
+                      description: "Id of the team member"
+                    availability:
+                      $ref: "#/components/schemas/Availability"
+  /stores/{storeId}/books:
     get:
       description: "Get booked services of a store in a time range (all team members)"
       tags:
