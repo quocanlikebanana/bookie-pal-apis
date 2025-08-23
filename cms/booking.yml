@@ -33,21 +33,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                  - adminId
-                  - metadata
-                properties:
-                  id:
-                    $ref: "./common.yml#/components/schemas/Id"
-                    description: Id of the store
-                  adminId:
-                    $ref: "./common.yml#/components/schemas/Id"
-                    description: Id of the admin of the store
-                  metadata:
-                    type: object
-                    additionalProperties: true
+                $ref: "#/components/schemas/Store2"
     put:
       description: "Update a store by id"
       tags:
@@ -59,9 +45,7 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - name
-
+              additionalProperties: true
       responses:
         "200":
           description: OK
@@ -638,7 +622,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Team"
-  /unauth-stores/{storeId}/book:
+  /unauth-stores/{storeId}/books:
     post:
       description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
       tags:
@@ -927,6 +911,64 @@ paths:
         "204":
           description: No Content
 
+  /v2/customer/books:
+    get:
+      description: "Get all bookings of a customer by accountId"
+      tags:
+        - Book
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+          description: "Search string for filtering, search by store name or service name"
+        - $ref: "#/components/parameters/bookingStatusFilterQuery"
+          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - books
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BookViewCustomer"
+  /v2/unauth/books/{bookId}:
+    get:
+      description: "Get a booking by id for a customer"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookViewCustomer"
+  /v2/unauth/stores/{storeId}:
+    get:
+      description: "Get a store by id for a customer"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store2"
+
 components:
   schemas:
     Time:
@@ -1157,6 +1199,7 @@ components:
         - ready
         - denied
         - done
+        - canceled
       example: "new"
       description: Status of the booking.
     BookingNotification:
@@ -1239,6 +1282,61 @@ components:
             updatedAt:
               $ref: "./common.yml#/components/schemas/DateTime"
               description: Last update date of the store
+    Store2:
+      type: object
+      required:
+        - id
+        - adminId
+        - metadata
+      properties:
+        id:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the store
+        adminId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the admin account
+        metadata:
+          type: object
+          description: Metadata of the store, can be any key-value pairs
+          additionalProperties: true
+    StoreFlattern:
+      type: object
+      properties:
+        id:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the store
+        adminId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the admin account
+        name:
+          type: string
+          example: "My Store"
+          description: Name of the store
+        industry:
+          type: string
+          example: "Beauty"
+          description: Industry of the store
+        bookingPageUrl:
+          type: string
+          format: uri
+          example: "https://example.com/booking"
+          description: URL of the booking page for the store
+        workHours:
+          $ref: "#/components/schemas/WorkHoursInWeek"
+          description: Work hours of the store in a week
+        minutesPerChunk:
+          type: integer
+          example: 15
+          description: Minutes chunk for the store (default is 15 minutes)
+      required:
+        - id
+        - adminId
+        - name
+        - industry
+        - bookingPageUrl
+        - workHours
+        - minutesPerChunk
+      additionalProperties: true
 
     Profile:
       allOf:
@@ -1463,6 +1561,45 @@ components:
           type: boolean
           example: false
           description: Is the service hidden or not
+
+    BookViewCustomer:
+      type: object
+      properties:
+        id:
+          $ref: "./common.yml#/components/schemas/Id"
+        start:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        end:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        notification:
+          $ref: "#/components/schemas/BookingNotification"
+          description: Notification for the booking
+        comment:
+          type: string
+          example: "Please bring your own mask"
+          description: Comment for the service
+        store:
+          $ref: "#/components/schemas/StoreFlattern"
+          description: Store where the booking is made
+        service:
+          $ref: "#/components/schemas/Service"
+        team:
+          $ref: "#/components/schemas/Team"
+        profile:
+          $ref: "#/components/schemas/Profile"
+          description: Booking profile of the customer when they have created the booking (has ID).
+        status:
+          $ref: "#/components/schemas/BookingStatus"
+      required:
+        - id
+        - start
+        - end
+        - notification
+        - store
+        - service
+        - team
+        - profile
+        - status
 
   parameters:
     accountId:
