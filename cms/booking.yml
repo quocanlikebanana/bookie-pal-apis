@@ -940,6 +940,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookViewCustomer"
+
   /v2/unauth/books/{bookId}:
     get:
       description: "Get a booking by id for a customer"
@@ -968,6 +969,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Store2"
+  /v2/unauth/stores/{storeId}/services:
+    get:
+      description: "Get services of a store for a customer. Where only active services are returned. (no hidden services)"
+      tags:
+        - Store
+        - Service
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+          description: "Search string for filtering, search by name of the service"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - services
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Service"
+  /v2/unauth/services/{serviceId}:
+    get:
+      description: "Get a service by id for a customer. Only active services are returned. (no hidden services)"
+      tags:
+        - Service
+        - Unauthenticated
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
 
 components:
   schemas:
