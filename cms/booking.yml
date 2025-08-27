@@ -648,35 +648,6 @@ paths:
                   id:
                     $ref: "./common.yml#/components/schemas/Id"
                     description: Id of the booking
-  /unauth-stores/{storeId}/services:
-    get:
-      description: "Get services of a store."
-      tags:
-        - Store
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
-          description: "Search string for filtering, search by name of the service"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - services
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  services:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Service"
   /unauth-stores/{storeId}/teams:
     get:
       description: "Get team members for a store version 2"
