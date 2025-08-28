@@ -1492,59 +1492,14 @@ components:
           example: 1
           minimum: 0
 
-    CreateService:
+    ServiceCore:
       type: object
       required:
-        - name
-        - duration
-        - members
-      properties:
-        storeId:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the store
-        name:
-          type: string
-          example: "Haircut"
-          description: Name of the service
-        description:
-          type: string
-          example: "A simple haircut service"
-          description: Description of the service
-        duration:
-          type: integer
-          example: 30
-          description: Duration of the service in minutes.
-          minimum: 0
-        members:
-          type: array
-          items:
-            $ref: "./common.yml#/components/schemas/Id"
-            description: "Team member ID array"
-          description: Team members who can provide the service
-        category:
-          type: string
-          example: "Hair"
-          description: Category of the service
-        avatar:
-          type: string
-          description: Avatar of the service (File)
-        hidden:
-          type: boolean
-          example: false
-          description: Is the service hidden or not
-    Service:
-      type: object
-      required:
-        - id
         - storeId
         - name
         - duration
-        - members
         - hidden
       properties:
-        id:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the service
         storeId:
           $ref: "./common.yml#/components/schemas/Id"
           description: Id of the store
@@ -1561,23 +1516,57 @@ components:
           example: 30
           description: Duration of the service in minutes.
           minimum: 0
-        members:
-          type: array
-          items:
-            $ref: "#/components/schemas/Team"
-          description: Team members who can provide the service
         category:
           type: string
           example: "Hair"
           description: Category of the service
         avatar:
           type: string
-          example: "https://example.com/avatar.jpg"
           description: Avatar of the service
         hidden:
           type: boolean
           example: false
           description: Is the service hidden or not
+        price:
+          type: number
+          example: 20.5
+          description: Price of the service, 0 means free service
+          minimum: 0
+          default: 0
+        appearance:
+          type: string
+          example: "#FF5733"
+          description: Appearance color of the service in hex format, e.g. #FF5733
+          pattern: "^#([0-9A-Fa-f]{6})$"
+          default: "#000000"
+    CreateService:
+      allOf:
+        - $ref: "#/components/schemas/ServiceCore"
+        - type: object
+          required:
+            - memberIds
+          properties:
+            memberIds:
+              type: array
+              items:
+                $ref: "./common.yml#/components/schemas/Id"
+              description: Team members who can provide the service
+    Service:
+      allOf:
+        - $ref: "#/components/schemas/ServiceCore"
+        - type: object
+          required:
+            - id
+            - members
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the service
+            members:
+              type: array
+              items:
+                $ref: "#/components/schemas/Team"
+              description: Team members who can provide the service
 
     BookViewCustomer:
       type: object
