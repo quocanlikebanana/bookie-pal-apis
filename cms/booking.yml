@@ -20,36 +20,6 @@ security:
   - BearerAuth: []
 
 paths:
-  /v2/stores/{storeId}:
-    get:
-      description: "Get a store by id"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Store2"
-    put:
-      description: "Update a store by id"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: true
-      responses:
-        "200":
-          description: OK
-
   /stores:
     get:
       description: "Get all stores"
@@ -793,6 +763,8 @@ paths:
                     items:
                       $ref: "#/components/schemas/Team"
 
+  # CMS User APIs
+
   /v2/profiles:
     get:
       description: "Get all profiles of the store (booked customers with accountId)"
@@ -882,6 +854,123 @@ paths:
         "204":
           description: No Content
 
+  /v2/stores/{storeId}:
+    get:
+      description: "Get a store by id"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store2"
+    put:
+      description: "Update a store by id"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: OK
+
+  /v2/stores/{storeId}/teams:
+    get:
+      description: "Get team members for a store version 2"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+        - name: roles
+          in: query
+          required: false
+          description: "Filter team members by array of roles. E.g. ?roles=1&roles=2"
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/CMSRole"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - teams
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  teams:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Team2"
+
+  /v2/teams:
+    post:
+      description: "Add a team member to a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeam2"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+  /v2/teams/{teamId}:
+    put:
+      description: "Update a team member by id"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTeam2"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Remove a team member from a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "204":
+          description: No Content
+
+  # Customer APIs
+
   /v2/customer/books:
     get:
       description: "Get all bookings of a customer by accountId"
@@ -911,6 +1000,8 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookViewCustomer"
+
+  # Customer Unauthenticated APIs
 
   /v2/unauth/books/{bookId}:
     get:
@@ -1466,6 +1557,111 @@ components:
             teamId:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member
+
+    CreateTeam2:
+      type: object
+      required:
+        - storeId
+        - role
+        - workHours
+        - name
+      properties:
+        storeId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the store
+        role:
+          $ref: "#/components/schemas/CMSRole"
+        workHours:
+          $ref: "#/components/schemas/WorkHoursInWeek"
+        name:
+          type: string
+          example: "Quo"
+          description: Name of the team member to invite
+        email:
+          type: string
+          example: "quo@gmail.com"
+          description: Email of the team member to invite (optional)
+        phone:
+          type: string
+          example: "+84123456789"
+          description: Phone number of the team member to invite (optional)
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the team member to invite (optional)
+        address:
+          type: string
+          example: "123, Example Street, City, Country"
+          description: Address of the team member to invite (optional)
+    UpdateTeam2:
+      type: object
+      properties:
+        role:
+          $ref: "#/components/schemas/CMSRole"
+        workHours:
+          $ref: "#/components/schemas/WorkHoursInWeek"
+        name:
+          type: string
+          example: "Quo"
+          description: Name of the team member to invite
+        email:
+          type: string
+          example: "quo@gmail.com"
+          description: Email of the team member to invite (optional)
+        phone:
+          type: string
+          example: "+84123456789"
+          description: Phone number of the team member to invite (optional)
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the team member to invite (optional)
+        address:
+          type: string
+          example: "123, Example Street, City, Country"
+          description: Address of the team member to invite (optional)
+    Team2:
+      type: object
+      required:
+        - id
+        - storeId
+        - role
+        - workHours
+        - name
+      properties:
+        id:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the team member in Booking domain (not the account id).
+        storeId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the store
+        role:
+          $ref: "#/components/schemas/CMSRole"
+        workHours:
+          $ref: "#/components/schemas/WorkHoursInWeek"
+        name:
+          type: string
+          example: "Quo"
+          description: Name of the team member to invite
+        accountId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the account, can be undefined if the team member has not accepted the invitation yet.
+        email:
+          type: string
+          example: "quo@gmail.com"
+          description: Email of the team member to invite (optional)
+        phone:
+          type: string
+          example: "+84123456789"
+          description: Phone number of the team member to invite (optional)
+        avatar:
+          type: string
+          example: "https://example.com/avatar.jpg"
+          description: Avatar of the team member to invite (optional)
+        address:
+          type: string
+          example: "123, Example Street, City, Country"
+          description: Address of the team member to invite (optional)
 
     SMSAccount:
       type: object
