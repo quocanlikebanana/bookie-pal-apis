@@ -157,6 +157,10 @@ components:
         avatar:
           type: string
           example: https://example.com/avatar.jpg
+        isGoogle:
+          type: boolean
+          example: false
+          description: Indicates if the user registered via Google OAuth
     TokenAuth:
       type: object
       required:
