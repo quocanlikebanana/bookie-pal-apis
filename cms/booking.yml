@@ -1320,33 +1320,8 @@ components:
           end:
             $ref: "./common.yml#/components/schemas/DateTime"
           notification:
-            type: object
-            required:
-              - email
-              - sms
-            properties:
-              email:
-                type: boolean
-                description: Send email notification
-                example: true
-              sms:
-                type: boolean
-                description: Send SMS notification
-                example: true
-              googleCalendar:
-                type: object
-                description: Google Calendar notification details
-                required:
-                  - isEnabled
-                properties:
-                  isEnabled:
-                    type: boolean
-                    description: Whether to send Google Calendar notification
-                    example: false
-                  accessToken:
-                    type: string
-                    description: Google Calendar access token. Required if isEnabled is true and user account is not from Google SSO.
-                    example: "ya29.a0AfH6SM..."
+            $ref: "#/components/schemas/BookingNotification"
+            description: Notification for the booking
           comment:
             type: string
             example: "Please bring your own mask"
@@ -1402,6 +1377,7 @@ components:
       required:
         - email
         - sms
+        - googleCalendar
       properties:
         email:
           type: boolean
@@ -1411,6 +1387,20 @@ components:
           type: boolean
           description: Send SMS notification
           example: true
+        googleCalendar:
+          type: object
+          description: Google Calendar notification details
+          required:
+            - isEnabled
+          properties:
+            isEnabled:
+              type: boolean
+              description: Whether to send Google Calendar notification
+              example: false
+            accessToken:
+              type: string
+              description: Google Calendar access token. Required if isEnabled is true and user account is not from Google SSO.
+              example: "ya29.a0AfH6SM..."
 
     CreateStore:
       type: object
