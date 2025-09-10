@@ -1612,7 +1612,7 @@ components:
         services:
           type: array
           items:
-            $ref: "#/components/schemas/Service"
+            $ref: "#/components/schemas/ServiceCore"
           description: Services booked in this booking
         team:
           $ref: "#/components/schemas/Team"
@@ -2105,7 +2105,6 @@ components:
               items:
                 $ref: "#/components/schemas/Team"
               description: Team members who can provide the service
-
 
   parameters:
     accountId:
