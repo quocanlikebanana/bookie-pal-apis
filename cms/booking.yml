@@ -1104,6 +1104,152 @@ paths:
               schema:
                 $ref: "#/components/schemas/Service"
 
+  # Multiple services per booking migration
+  
+  /v3/books:
+    post:
+      description: "Book multiple services in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
+      tags:
+        - Store
+        - Book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookCreate2"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the booking
+  /v3/books/{bookId}:
+    get:
+      description: "Get a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookView2"
+    put:
+      description: "Update a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookCreate2"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Delete a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      responses:
+        "204":
+          description: No Content
+  /v3/books/{bookId}/status:
+    patch:
+      description: "Update status of a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: "#/components/schemas/BookingStatus"
+      responses:
+        "200":
+          description: OK
+  /v3/cms/books:
+    get:
+      description: "Get all bookings (depends on CMS role)"
+      tags:
+        - Book
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "#/components/parameters/storeIdQuery"
+        - $ref: "#/components/parameters/teamIdQuery"
+        - $ref: "#/components/parameters/accountIdQuery"
+        - $ref: "#/components/parameters/serviceIdQuery"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+        - $ref: "#/components/parameters/bookingStatusFilterQuery"
+          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - books
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BookView2"
+  /v3/customer/books:
+    get:
+      description: "Get all bookings of a customer by accountId (accountId is from the token)"
+      tags:
+        - Book
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+          description: "Search string for filtering by store name"
+        - $ref: "#/components/parameters/bookingStatusFilterQuery"
+          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - books
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BookView2"
+
 components:
   schemas:
     Time:
@@ -1401,6 +1547,126 @@ components:
               type: string
               description: Google Calendar access token. Required if isEnabled is true and user account is not from Google SSO.
               example: "ya29.a0AfH6SM..."
+    BookViewCustomer:
+      description: Book view for customer, with limited fields.
+      type: object
+      properties:
+        id:
+          $ref: "./common.yml#/components/schemas/Id"
+        start:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        end:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        notification:
+          $ref: "#/components/schemas/BookingNotification"
+          description: Notification for the booking
+        comment:
+          type: string
+          example: "Please bring your own mask"
+          description: Comment for the service
+        store:
+          $ref: "#/components/schemas/StoreFlattern"
+          description: Store where the booking is made
+        service:
+          $ref: "#/components/schemas/Service"
+        team:
+          $ref: "#/components/schemas/Team"
+        profile:
+          $ref: "#/components/schemas/Profile"
+          description: Booking profile of the customer when they have created the booking (has ID).
+        status:
+          $ref: "#/components/schemas/BookingStatus"
+      required:
+        - id
+        - start
+        - end
+        - notification
+        - store
+        - service
+        - team
+        - profile
+        - status
+    
+    BookView2:
+      description: Base book view with common fields.
+      type: object
+      properties:
+        id:
+          $ref: "./common.yml#/components/schemas/Id"
+        start:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        end:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        notification:
+          $ref: "#/components/schemas/BookingNotification"
+          description: Notification for the booking
+        comment:
+          type: string
+          example: "Please bring your own mask"
+          description: Comment for the service
+        profile:
+          $ref: "#/components/schemas/Profile"
+          description: Booking profile of the customer when they have created the booking (has ID).
+        status:
+          $ref: "#/components/schemas/BookingStatus"
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/Service"
+          description: Services booked in this booking
+        team:
+          $ref: "#/components/schemas/Team"
+          description: Team member assigned for this booking
+        store:
+          $ref: "#/components/schemas/StoreFlattern"
+          description: Store where the booking is made
+      required:
+        - id
+        - start
+        - end
+        - notification
+        - services
+        - team
+        - profile
+        - status
+        - store
+    BookCreate2:
+      description: Create book with multiple services.
+      type: object
+      properties:
+        storeId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the store
+        start:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        end:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        notification:
+          $ref: "#/components/schemas/BookingNotification"
+          description: Notification for the booking
+        comment:
+          type: string
+          example: "Please bring your own mask"
+          description: Comment for the service
+        servicesIds:
+          type: array
+          items:
+            $ref: "./common.yml#/components/schemas/Id"
+          description: Array of service Ids booked in this booking
+        teamId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the team member
+        profile:
+          $ref: "#/components/schemas/CreateProfile"
+          description: Booking profile of the customer.
+      required:
+        - storeId
+        - start
+        - end
+        - notification
+        - servicesIds
+        - teamId
+        - profile
 
     CreateStore:
       type: object
@@ -1542,7 +1808,6 @@ components:
                   type: integer
                   example: 10
                   description: Total number of bookings made by the customer
-
     CreateProfile:
       type: object
       required:
@@ -1841,44 +2106,6 @@ components:
                 $ref: "#/components/schemas/Team"
               description: Team members who can provide the service
 
-    BookViewCustomer:
-      type: object
-      properties:
-        id:
-          $ref: "./common.yml#/components/schemas/Id"
-        start:
-          $ref: "./common.yml#/components/schemas/DateTime"
-        end:
-          $ref: "./common.yml#/components/schemas/DateTime"
-        notification:
-          $ref: "#/components/schemas/BookingNotification"
-          description: Notification for the booking
-        comment:
-          type: string
-          example: "Please bring your own mask"
-          description: Comment for the service
-        store:
-          $ref: "#/components/schemas/StoreFlattern"
-          description: Store where the booking is made
-        service:
-          $ref: "#/components/schemas/Service"
-        team:
-          $ref: "#/components/schemas/Team"
-        profile:
-          $ref: "#/components/schemas/Profile"
-          description: Booking profile of the customer when they have created the booking (has ID).
-        status:
-          $ref: "#/components/schemas/BookingStatus"
-      required:
-        - id
-        - start
-        - end
-        - notification
-        - store
-        - service
-        - team
-        - profile
-        - status
 
   parameters:
     accountId:
@@ -1967,7 +2194,7 @@ components:
     bookingStatusFilterQuery:
       name: status
       in: query
-      description: "Filter bookings by status"
+      description: "Filter bookings by status. Can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
       schema:
         type: array
         items:
