@@ -20,107 +20,6 @@ security:
   - BearerAuth: []
 
 paths:
-  /stores:
-    get:
-      description: "Get all stores"
-      tags:
-        - Store
-      parameters:
-        - $ref: "./common.yml#/components/parameters/search"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - name: industries
-          in: query
-          required: false
-          description: "Filter stores by array industries"
-          schema:
-            type: array
-            items:
-              type: string
-              example: "Beauty"
-              description: Name of the industry
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - stores
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  stores:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Store"
-  /stores/{storeId}:
-    get:
-      description: "Get a store by id"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Store"
-    put:
-      description: "Update a store by id"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/CreateStore"
-                - type: object
-                  properties:
-                    avatar:
-                      type: string
-                      description: "Avatar File of the store"
-      responses:
-        "200":
-          description: OK
-  /stores/{storeId}/books:
-    post:
-      description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/CreateBook"
-                - type: object
-                  properties:
-                    redirectUrl:
-                      type: string
-                      description: "Redirect URL after booking is created, if not provided, it will be null"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    $ref: "./common.yml#/components/schemas/Id"
-                    description: Id of the booking
   /stores/{storeId}/services:
     get:
       description: "Get services of a store."
@@ -152,7 +51,7 @@ paths:
                       $ref: "#/components/schemas/Service"
   /stores/{storeId}/teams:
     get:
-      description: "Get team members for a store version 2"
+      description: "Get team members for a store"
       tags:
         - Store
         - Team
@@ -221,97 +120,6 @@ paths:
         - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-
-  /books:
-    get:
-      description: "Get all bookings (depends on the user role)"
-      tags:
-        - Book
-      parameters:
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/storeIdQuery"
-        - $ref: "#/components/parameters/teamIdQuery"
-        - $ref: "#/components/parameters/accountIdQuery"
-        - $ref: "#/components/parameters/serviceIdQuery"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/end"
-        - $ref: "#/components/parameters/bookingStatusFilterQuery"
-          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - books
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  books:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Book"
-  /books/{bookId}:
-    get:
-      description: "Get a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Book"
-    put:
-      description: "Update a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateBook"
-      responses:
-        "200":
-          description: OK
-    delete:
-      description: "Delete a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "204":
-          description: No Content
-  /books/{bookId}/status:
-    patch:
-      description: "Update status of a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - status
-              properties:
-                status:
-                  $ref: "#/components/schemas/BookingStatus"
       responses:
         "200":
           description: OK
@@ -854,6 +662,32 @@ paths:
         "204":
           description: No Content
 
+  /v3/customer/stores:
+    get:
+      description: "Get all stores subscribed by a customer by accountId"
+      tags:
+        - Store
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - stores
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  stores:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Store2"
   /v2/stores/{storeId}:
     get:
       description: "Get a store by id"
@@ -883,91 +717,6 @@ paths:
       responses:
         "200":
           description: OK
-
-  /v2/stores/{storeId}/teams:
-    get:
-      description: "Get team members for a store version 2"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
-        - name: roles
-          in: query
-          required: false
-          description: "Filter team members by array of roles. E.g. ?roles=1&roles=2"
-          schema:
-            type: array
-            items:
-              $ref: "#/components/schemas/CMSRole"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - teams
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  teams:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Team2"
-
-  /v2/teams:
-    post:
-      description: "Add a team member to a store"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateTeam2"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    $ref: "./common.yml#/components/schemas/Id"
-  /v2/teams/{teamId}:
-    put:
-      description: "Update a team member by id"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateTeam2"
-      responses:
-        "200":
-          description: OK
-    delete:
-      description: "Remove a team member from a store"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-      responses:
-        "204":
-          description: No Content
 
   # Customer APIs
 
@@ -1087,7 +836,31 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/Service"
-  
+  /v2/unauth/stores/find-by-subdomain/{subdomain}:
+    get:
+      description: "Get a store by subdomain for a customer"
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - name: subdomain
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "Subdomain of the store"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  store:
+                    $ref: "#/components/schemas/Store2"
+                    description: "Store details (undefined if not found)"
+
   /v2/unauth/services/{serviceId}:
     get:
       description: "Get a service by id for a customer. Only active services are returned. (no hidden services)"
@@ -1220,6 +993,7 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookView2"
+  
   /v3/customer/books:
     get:
       description: "Get all bookings of a customer by accountId (accountId is from the token)"
@@ -1249,6 +1023,48 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookView2"
+  /v3/unauth/books:
+    post:
+      description: "Book multiple services in a store by a customer (accountId is from the token). Note: Customer can be anonymous with different schema (see the schema option)"
+      tags:
+        - Store
+        - Book
+        - Customer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookCreate2"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the booking
+                    example: "1234567890"
+  /v3/unauth/books/{bookId}:
+    get:
+      description: "Get a booking by id for a customer"
+      tags:
+        - Book
+        - Customer
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookView2"
+  
 
 components:
   schemas:
@@ -1612,7 +1428,7 @@ components:
         services:
           type: array
           items:
-            $ref: "#/components/schemas/ServiceCore"
+            $ref: "#/components/schemas/ServiceBookView"
           description: Services booked in this booking
         team:
           $ref: "#/components/schemas/Team"
@@ -1648,7 +1464,7 @@ components:
           type: string
           example: "Please bring your own mask"
           description: Comment for the service
-        servicesIds:
+        serviceIds:
           type: array
           items:
             $ref: "./common.yml#/components/schemas/Id"
@@ -1664,7 +1480,7 @@ components:
         - start
         - end
         - notification
-        - servicesIds
+        - serviceIds
         - teamId
         - profile
 
@@ -1869,10 +1685,16 @@ components:
         - type: object
           required:
             - id
+            - serviceIds
           properties:
             id:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member in Booking domain (not the account id).
+            serviceIds:
+              type: array
+              items:
+                $ref: "./common.yml#/components/schemas/Id"
+              description: Array of service Ids that the team member can provide
     CreateTimeOff:
       type: object
       required:
@@ -1899,111 +1721,6 @@ components:
             teamId:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member
-
-    CreateTeam2:
-      type: object
-      required:
-        - storeId
-        - role
-        - workHours
-        - name
-      properties:
-        storeId:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the store
-        role:
-          $ref: "#/components/schemas/CMSRole"
-        workHours:
-          $ref: "#/components/schemas/WorkHoursInWeek"
-        name:
-          type: string
-          example: "Quo"
-          description: Name of the team member to invite
-        email:
-          type: string
-          example: "quo@gmail.com"
-          description: Email of the team member to invite (optional)
-        phone:
-          type: string
-          example: "+84123456789"
-          description: Phone number of the team member to invite (optional)
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the team member to invite (optional)
-        address:
-          type: string
-          example: "123, Example Street, City, Country"
-          description: Address of the team member to invite (optional)
-    UpdateTeam2:
-      type: object
-      properties:
-        role:
-          $ref: "#/components/schemas/CMSRole"
-        workHours:
-          $ref: "#/components/schemas/WorkHoursInWeek"
-        name:
-          type: string
-          example: "Quo"
-          description: Name of the team member to invite
-        email:
-          type: string
-          example: "quo@gmail.com"
-          description: Email of the team member to invite (optional)
-        phone:
-          type: string
-          example: "+84123456789"
-          description: Phone number of the team member to invite (optional)
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the team member to invite (optional)
-        address:
-          type: string
-          example: "123, Example Street, City, Country"
-          description: Address of the team member to invite (optional)
-    Team2:
-      type: object
-      required:
-        - id
-        - storeId
-        - role
-        - workHours
-        - name
-      properties:
-        id:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the team member in Booking domain (not the account id).
-        storeId:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the store
-        role:
-          $ref: "#/components/schemas/CMSRole"
-        workHours:
-          $ref: "#/components/schemas/WorkHoursInWeek"
-        name:
-          type: string
-          example: "Quo"
-          description: Name of the team member to invite
-        accountId:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the account, can be undefined if the team member has not accepted the invitation yet.
-        email:
-          type: string
-          example: "quo@gmail.com"
-          description: Email of the team member to invite (optional)
-        phone:
-          type: string
-          example: "+84123456789"
-          description: Phone number of the team member to invite (optional)
-        avatar:
-          type: string
-          example: "https://example.com/avatar.jpg"
-          description: Avatar of the team member to invite (optional)
-        address:
-          type: string
-          example: "123, Example Street, City, Country"
-          description: Address of the team member to invite (optional)
 
     SMSAccount:
       type: object
@@ -2105,6 +1822,16 @@ components:
               items:
                 $ref: "#/components/schemas/Team"
               description: Team members who can provide the service
+    ServiceBookView:
+      allOf:
+        - $ref: "#/components/schemas/ServiceCore"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the service
 
   parameters:
     accountId:
