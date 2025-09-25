@@ -20,11 +20,71 @@ security:
   - BearerAuth: []
 
 paths:
-  /stores/{storeId}/services:
+
+  # ------------------------------------------
+  # CMS
+  # ------------------------------------------
+
+  # Book
+
+  /v3/cms/books:
+    get:
+      description: "Get all bookings (depends on CMS role)"
+      tags:
+        - Book
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "#/components/parameters/storeIdQuery"
+        - $ref: "#/components/parameters/teamIdQuery"
+        - $ref: "#/components/parameters/accountIdQuery"
+        - $ref: "#/components/parameters/serviceIdQuery"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+        - $ref: "#/components/parameters/bookingStatusFilterQuery"
+          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - books
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  books:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BookView2"
+  /v3/cms/teams/{teamId}/books:
+    get:
+      description: "Get booked services of a team member in a store in time range"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookView2"
+
+  # Service
+
+  /v3/cms/stores/{storeId}/services:
     get:
       description: "Get services of a store."
       tags:
-        - Store
         - Service
       parameters:
         - $ref: "#/components/parameters/storeId"
@@ -48,83 +108,111 @@ paths:
                   services:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Service"
-  /stores/{storeId}/teams:
+                      $ref: "#/components/schemas/ServiceView2"
+  /v3/cms/teams/{teamId}/services:
     get:
-      description: "Get team members for a store"
+      description: "Get services of a team member in a store"
       tags:
-        - Store
         - Team
+        - Service
       parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-          description: "Search string for filtering, search by name of the team member"
+        - $ref: "#/components/parameters/teamId"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - pagination
-                  - teams
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  teams:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Team"
-  /stores/{storeId}/customers:
-    get:
-      description: "Get customers booked that has account."
-      tags:
-        - Store
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - customers
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  customers:
-                    type: array
-                    items:
-                      $ref: "./common.yml#/components/schemas/Id"
-                      description: Account IDs.
-  /stores/{storeId}/connection:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceView2"
+  /v3/cms/services:
     post:
-      description: "Connect a client to a store, (only for Client)"
+      description: "Create a service"
       tags:
-        - Store
+        - Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateService"
+      responses:
+        "201":
+          description: Created
+  /v3/cms/services/{serviceId}:
+    get:
+      description: "Get a service by id"
+      tags:
+        - Service
       parameters:
-        - $ref: "#/components/parameters/storeId"
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceView2"
+    put:
+      description: "Update a service"
+      tags:
+        - Service
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateService"
       responses:
         "200":
           description: OK
     delete:
-      description: "Disconnect a client from a store, (only for Client)"
+      description: "Delete a service"
       tags:
-        - Store
+        - Service
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "204":
+          description: No Content
+ 
+  # Team
+
+  /v3/cms/services/{serviceId}/teams:
+    get:
+      description: "Get all team members for a service (no pagination)"
+      tags:
+        - Service
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+  /v3/cms/stores/{storeId}/teams:
+    get:
+      description: "Get team members for a store"
+      tags:
+        - Team
       parameters:
         - $ref: "#/components/parameters/storeId"
       responses:
         "200":
           description: OK
-
-  /teams/{teamId}:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+  /v3/cms/teams/{teamId}:
     get:
       description: "Get a team member by id"
       tags:
@@ -147,27 +235,7 @@ paths:
       responses:
         "204":
           description: No Content
-  /teams/{teamId}/role:
-    patch:
-      description: "Update role of a team member in a store"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - role
-              properties:
-                role:
-                  $ref: "#/components/schemas/CMSRole"
-      responses:
-        "200":
-          description: OK
-  /teams/{teamId}/work-hours:
+  /v3/cms/teams/{teamId}/work-hours:
     patch:
       description: "Update work hours of a team member in a store"
       tags:
@@ -187,7 +255,7 @@ paths:
       responses:
         "200":
           description: OK
-  /teams/{teamId}/time-off:
+  /v3/cms/teams/{teamId}/time-off:
     get:
       description: "Get time off of a team member in a store"
       tags:
@@ -237,349 +305,16 @@ paths:
       responses:
         "204":
           description: No Content
-  /teams/{teamId}/availability:
-    get:
-      description: "Get availability of a team member in a store in time range"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/end"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Availability"
-  /teams/{teamId}/book:
-    get:
-      description: "Get booked services of a team member in a store in time range"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/end"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Book"
-  /teams/{teamId}/services:
-    get:
-      description: "Get services of a team member in a store"
-      tags:
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Service"
+  
+  # Profile
 
-  /services:
-    post:
-      description: "Create a service"
-      tags:
-        - Service
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateService"
-      responses:
-        "201":
-          description: Created
-  /services/{serviceId}:
-    get:
-      description: "Get a service by id"
-      tags:
-        - Service
-      parameters:
-        - $ref: "#/components/parameters/serviceId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Service"
-    put:
-      description: "Update a service"
-      tags:
-        - Service
-      parameters:
-        - $ref: "#/components/parameters/serviceId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateService"
-      responses:
-        "200":
-          description: OK
-    delete:
-      description: "Delete a service"
-      tags:
-        - Service
-      parameters:
-        - $ref: "#/components/parameters/serviceId"
-      responses:
-        "204":
-          description: No Content
-  /services/{serviceId}/teams:
-    get:
-      description: "Get team members for a service"
-      tags:
-        - Service
-        - Team
-      parameters:
-        - $ref: "#/components/parameters/serviceId"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/end"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-          description: "Search string for filtering, search by name of the team member"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - teams
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  teams:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Team"
-
-  /unauth-stores/{storeId}:
-    get:
-      description: "Get a store by id"
-      tags:
-        - Store
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Store"
-  /unauth-stores/{storeId}/accounts/{accountId}:
-    get:
-      description: "Get Team based on storeId and accountId"
-      tags:
-        - Store
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "#/components/parameters/accountId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Team"
-  /unauth-stores/{storeId}/books:
-    post:
-      description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
-      tags:
-        - Store
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateBook"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    $ref: "./common.yml#/components/schemas/Id"
-                    description: Id of the booking
-  /unauth-stores/{storeId}/teams:
-    get:
-      description: "Get team members for a store version 2"
-      tags:
-        - Store
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-          description: "Search string for filtering, search by name of the team member"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - teams
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  teams:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Team"
-
-  /unauth-books/{bookId}:
-    get:
-      description: "Get a booking by id"
-      tags:
-        - Book
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Book"
-    put:
-      description: "Update a booking by id"
-      tags:
-        - Book
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateBook"
-      responses:
-        "200":
-          description: OK
-    delete:
-      description: "Delete a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "204":
-          description: No Content
-
-  /unauth-teams/{teamId}/services:
-    get:
-      description: "Get services of a team member in a store"
-      tags:
-        - Team
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Service"
-  /unauth-teams/{teamId}:
-    get:
-      description: "Get a team member by id"
-      tags:
-        - Team
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Team"
-  /unauth-teams/{teamId}/availability:
-    get:
-      description: "Get availability of a team member in a store in time range"
-      tags:
-        - Team
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/teamId"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/end"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Availability"
-
-  /unauth-services/{serviceId}/teams:
-    get:
-      description: "Get team members for a service"
-      tags:
-        - Service
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/serviceId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-          description: "Search string for filtering, search by name of the team member"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  teams:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Team"
-
-  # CMS User APIs
-
-  /v2/profiles:
+  /v3/cms/stores/{storeId}/profiles:
     get:
       description: "Get all profiles of the store (booked customers with accountId)"
       tags:
         - Profile
       parameters:
-        - $ref: "#/components/parameters/storeIdQuery"
+        - $ref: "#/components/parameters/storeId"
         - $ref: "#/components/parameters/hasAccountQuery"
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
@@ -606,6 +341,8 @@ paths:
       description: "Create a profile of the store (booked customers with accountId)"
       tags:
         - Profile
+      parameters:
+        - $ref: "#/components/parameters/storeId"
       requestBody:
         content:
           application/json:
@@ -624,7 +361,24 @@ paths:
                   id:
                     $ref: "./common.yml#/components/schemas/Id"
                     description: Id of the profile in Booking domain (not the account id).
-  /v2/profiles/{profileId}:
+  /v3/cms/stores/{storeId}/customers:
+    get:
+      description: "Get all customers of the store"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "./common.yml#/components/schemas/Id"
+                  description: Account IDs.
+  /v3/cms/profiles/{profileId}:
     get:
       description: "Get a profile by id"
       tags:
@@ -661,34 +415,9 @@ paths:
       responses:
         "204":
           description: No Content
-
-  /v3/customer/stores:
-    get:
-      description: "Get all stores subscribed by a customer by accountId"
-      tags:
-        - Store
-      parameters:
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - stores
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  stores:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Store2"
-  /v2/stores/{storeId}:
+  
+  # Store
+  /v3/cms/stores/{storeId}:
     get:
       description: "Get a store by id"
       tags:
@@ -718,20 +447,21 @@ paths:
         "200":
           description: OK
 
-  # Customer APIs
+  # ------------------------------------------
+  # Customer
+  # ------------------------------------------
 
-  /v2/customer/books:
+  # Store
+
+  /v3/customer/stores:
     get:
-      description: "Get all bookings of a customer by accountId"
+      description: "Get all stores subscribed by a customer by accountId"
       tags:
-        - Book
+        - Store
       parameters:
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "./common.yml#/components/parameters/search"
-          description: "Search string for filtering, search by store name or service name"
-        - $ref: "#/components/parameters/bookingStatusFilterQuery"
-          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
       responses:
         "200":
           description: OK
@@ -741,259 +471,36 @@ paths:
                 type: object
                 required:
                   - pagination
-                  - books
+                  - stores
                 properties:
                   pagination:
                     $ref: "./common.yml#/components/schemas/Pagination"
-                  books:
+                  stores:
                     type: array
                     items:
-                      $ref: "#/components/schemas/BookViewCustomer"
-
-  # Customer Unauthenticated APIs
-
-  /v2/unauth/books:
+                      $ref: "#/components/schemas/Store2"
+  /v3/customer/stores/{storeId}/connection:
     post:
-      description: "Book a service in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
-      tags:
-        - Store
-        - Unauthenticated
-        - Book
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CustomerCreateBook"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    $ref: "./common.yml#/components/schemas/Id"
-                    description: Id of the booking
-  /v2/unauth/books/{bookId}:
-    get:
-      description: "Get a booking by id for a customer"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BookViewCustomer"
-  
-  /v2/unauth/stores/{storeId}:
-    get:
-      description: "Get a store by id for a customer"
+      description: "Connect a client to a store, (only for Client)"
       tags:
         - Store
       parameters:
         - $ref: "#/components/parameters/storeId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Store2"
-  /v2/unauth/stores/{storeId}/services:
-    get:
-      description: "Get services of a store for a customer. Where only active services are returned. (no hidden services)"
-      tags:
-        - Store
-        - Service
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/storeId"
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "./common.yml#/components/parameters/search"
-          description: "Search string for filtering, search by name of the service"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - services
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  services:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Service"
-  /v2/unauth/stores/find-by-subdomain/{subdomain}:
-    get:
-      description: "Get a store by subdomain for a customer"
-      tags:
-        - Store
-        - Unauthenticated
-      parameters:
-        - name: subdomain
-          in: path
-          required: true
-          schema:
-            type: string
-          description: "Subdomain of the store"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  store:
-                    $ref: "#/components/schemas/Store2"
-                    description: "Store details (undefined if not found)"
-
-  /v2/unauth/services/{serviceId}:
-    get:
-      description: "Get a service by id for a customer. Only active services are returned. (no hidden services)"
-      tags:
-        - Service
-        - Unauthenticated
-      parameters:
-        - $ref: "#/components/parameters/serviceId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Service"
-
-  # Multiple services per booking migration
-  
-  /v3/books:
-    post:
-      description: "Book multiple services in a store by a CMS user. Note: Customer can be anonymous with different schema (see the schema option)"
-      tags:
-        - Store
-        - Book
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BookCreate2"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    $ref: "./common.yml#/components/schemas/Id"
-                    description: Id of the booking
-  /v3/books/{bookId}:
-    get:
-      description: "Get a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BookView2"
-    put:
-      description: "Update a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/BookCreate2"
       responses:
         "200":
           description: OK
     delete:
-      description: "Delete a booking by id"
+      description: "Disconnect a client from a store, (only for Client)"
       tags:
-        - Book
+        - Store
       parameters:
-        - $ref: "#/components/parameters/bookId"
-      responses:
-        "204":
-          description: No Content
-  /v3/books/{bookId}/status:
-    patch:
-      description: "Update status of a booking by id"
-      tags:
-        - Book
-      parameters:
-        - $ref: "#/components/parameters/bookId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - status
-              properties:
-                status:
-                  $ref: "#/components/schemas/BookingStatus"
+        - $ref: "#/components/parameters/storeId"
       responses:
         "200":
           description: OK
-  /v3/cms/books:
-    get:
-      description: "Get all bookings (depends on CMS role)"
-      tags:
-        - Book
-      parameters:
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
-        - $ref: "#/components/parameters/storeIdQuery"
-        - $ref: "#/components/parameters/teamIdQuery"
-        - $ref: "#/components/parameters/accountIdQuery"
-        - $ref: "#/components/parameters/serviceIdQuery"
-        - $ref: "#/components/parameters/start"
-        - $ref: "#/components/parameters/end"
-        - $ref: "#/components/parameters/bookingStatusFilterQuery"
-          description: "Filter bookings by status, can be multiple values, e.g. ?status=CONFIRMED&status=CANCELED"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - pagination
-                  - books
-                properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  books:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/BookView2"
-  
+
+  # Book
+
   /v3/customer/books:
     get:
       description: "Get all bookings of a customer by accountId (accountId is from the token)"
@@ -1023,6 +530,54 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookView2"
+
+  # ------------------------------------------
+  # Unauthenticated
+  # ------------------------------------------
+
+  # Store
+
+  /v3/unauth/stores/{storeId}:
+    get:
+      description: "Get a store by id for a customer"
+      tags:
+        - Store
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Store2"
+  /v3/unauth/stores/find-by-subdomain/{subdomain}:
+    get:
+      description: "Get a store by subdomain for a customer"
+      tags:
+        - Store
+        - Unauthenticated
+      parameters:
+        - name: subdomain
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "Subdomain of the store"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  store:
+                    $ref: "#/components/schemas/Store2"
+                    description: "Store details (undefined if not found)"
+  
+  # Book
+
   /v3/unauth/books:
     post:
       description: "Book multiple services in a store by a customer (accountId is from the token). Note: Customer can be anonymous with different schema (see the schema option)"
@@ -1064,8 +619,143 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BookView2"
+  /v3/unauth/books/{bookId}/status:
+    patch:
+      description: "Update status of a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  $ref: "#/components/schemas/BookingStatus"
+      responses:
+        "200":
+          description: OK
+
+  # Service
+
+  /v3/unauth/stores/{storeId}/services:
+    get:
+      description: "Get services of a store for a customer. Where only active services are returned. (no hidden services)"
+      tags:
+        - Service
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+          description: "Search string for filtering, search by name of the service"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - services
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceView2"
+  /v3/unauth/services/{serviceId}:
+    get:
+      description: "Get a service by id for a customer. Only active services are returned. (no hidden services)"
+      tags:
+        - Service
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceView2"
+  
+  # Team
+
+  /v3/unauth/services/{serviceId}/teams:
+    get:
+      description: "Get all team members for a service for a customer"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/serviceId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+  /v3/unauth/stores/{storeId}/teams:
+    get:
+      description: "Get team members for a store"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Team"
+  /v3/unauth/teams/{teamId}:
+    get:
+      description: "Get a team member by id"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Team"
+  /v3/unauth/teams/{teamId}/availability:
+    get:
+      description: "Get availability of a team member in a store in time range"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Availability"
+
+  # ------------------------------------------
+  # Common APIs
+  # ------------------------------------------
   
 
+  
 components:
   schemas:
     Time:
@@ -1604,33 +1294,13 @@ components:
         - workHours
         - minutesPerChunk
       additionalProperties: true
-
-    Profile:
-      allOf:
-        - $ref: "#/components/schemas/CreateProfile"
-          description: Profile of the customer with additional fields.
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              $ref: "./common.yml#/components/schemas/Id"
-              description: Id of the customer profile in Booking domain (not the account id).
-            _aggregate:
-              type: object
-              description: Aggregate data for the customer profile, such as total bookings, etc.
-              properties:
-                bookingCount:
-                  type: integer
-                  example: 10
-                  description: Total number of bookings made by the customer
-    CreateProfile:
+    
+    ProfileBase:
       type: object
       required:
         - name
         - phone
         - email
-        - storeId
       properties:
         accountId:
           $ref: "./common.yml#/components/schemas/Id"
@@ -1650,9 +1320,28 @@ components:
         avatar:
           type: string
           example: "https://example.com/avatar.jpg"
-        storeId:
-          $ref: "./common.yml#/components/schemas/Id"
-          description: Id of the store
+    Profile:
+      allOf:
+        - $ref: "#/components/schemas/ProfileBase"
+          description: Profile of the customer with additional fields.
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the customer profile in Booking domain (not the account id).
+            _aggregate:
+              type: object
+              description: Aggregate data for the customer profile, such as total bookings, etc.
+              properties:
+                bookingCount:
+                  type: integer
+                  example: 10
+                  description: Total number of bookings made by the customer
+    CreateProfile:
+      allOf:
+        - $ref: "#/components/schemas/ProfileBase"
 
     CMSRole:
       type: number
@@ -1822,6 +1511,22 @@ components:
               items:
                 $ref: "#/components/schemas/Team"
               description: Team members who can provide the service
+    ServiceView2:
+      allOf:
+        - $ref: "#/components/schemas/ServiceCore"
+        - type: object
+          required:
+            - id
+            - teamIds
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the service
+            teamIds:
+              type: array
+              items:
+                $ref: "./common.yml#/components/schemas/Id"
+              description: Ids of team members who can provide the service
     ServiceBookView:
       allOf:
         - $ref: "#/components/schemas/ServiceCore"
