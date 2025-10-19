@@ -1,0 +1,373 @@
+openapi: "3.0.3"
+info:
+  title: API Title
+  version: "1.0"
+servers:
+  - url: https://api.server.test/v1
+security:
+  - BearerAuth: []
+
+paths:
+  /logout:
+    post:
+      summary: Logout
+      description: Logout from the system (invalidate token in header)
+      responses:
+        "200":
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+  /accounts/{accountId}:
+    put:
+      summary: Update User Info
+      description: Update user information by account ID
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                address:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "200":
+          description: User information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /stores/{storeId}/invite:
+    post:
+      summary: Store Invite
+      description: Invite a user to the store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - cmsRole
+                - workHours
+                - redirectUrl
+              properties:
+                email:
+                  type: string
+                  format: email
+                cmsRole:
+                  $ref: "#/components/schemas/CmsRole"
+                workHours:
+                  $ref: "./booking.yml#/components/schemas/WorkHoursInWeek"
+                redirectUrl:
+                  type: string
+                  format: uri
+                  description: URL to redirect after email confirmation
+      responses:
+        "201":
+          description: User invited successfully
+  /stores/{storeId}/accounts/{accountId}/avatar:
+    put:
+      summary: Update Store User Avatar
+      description: Update the avatar of a user in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  description: "Avatar File of the user"
+      responses:
+        "200":
+          description: Store user avatar updated successfully
+  
+  /me:
+    get:
+      summary: Get Current User Info
+      description: Retrieve information about the currently authenticated user
+      responses:
+        "200":
+          description: Successful retrieval of current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # Version 2 endpoints: Uses HTTP only cookies for token management
+
+  /v2/logout:
+    post:
+      summary: Logout (v2)
+      description: Logout from the system (invalidate HTTP-only cookies)
+      responses:
+        "200":
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+  /v2/accounts/{accountId}:
+    put:
+      summary: Update User Info (v2)
+      description: Update user information by account ID
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                address:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "200":
+          description: User information updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /v2/stores/{storeId}/invite:
+    post:
+      summary: Store Invite (v2)
+      description: Invite a user to the store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - cmsRole
+                - workHours
+                - redirectUrl
+              properties:
+                email:
+                  type: string
+                  format: email
+                cmsRole:
+                  $ref: "#/components/schemas/CmsRole"
+                workHours:
+                  $ref: "./booking.yml#/components/schemas/WorkHoursInWeek"
+                redirectUrl:
+                  type: string
+                  format: uri
+                  description: URL to redirect after email confirmation
+      responses:
+        "201":
+          description: User invited successfully
+  /v2/stores/{storeId}/accounts/{accountId}/avatar:
+    put:
+      summary: Update Store User Avatar (v2)
+      description: Update the avatar of a user in a specific store
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - $ref: "#/components/parameters/AccountId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - avatar
+              properties:
+                avatar:
+                  type: string
+                  description: "Avatar File of the user"
+      responses:
+        "200":
+          description: Store user avatar updated successfully
+
+  /v2/me:
+    get:
+      summary: Get Current User Info (v2)
+      description: Retrieve information about the currently authenticated user
+      responses:
+        "200":
+          description: Successful retrieval of current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  
+components:
+  schemas:
+    Role:
+      type: number
+      enum:
+        - 1
+        - 2
+      description: Role of the user (1 - Client, 2 - CMS)
+    CmsRole:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+      description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+
+    User:
+      type: object
+      required:
+        - accountId
+        - role
+        - name
+        - phone
+        - email
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: John Doe
+        role:
+          $ref: "#/components/schemas/Role"
+        phone:
+          type: string
+          example: +1234567890
+        email:
+          type: string
+          example: johndoe@gmail.com
+          format: email
+        address:
+          type: string
+          example: 123 Main St, City, Country
+        avatar:
+          type: string
+          example: https://example.com/avatar.jpg
+        isGoogle:
+          type: boolean
+          example: false
+          description: Indicates if the user registered via Google OAuth
+    TokenAuth:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          example: abcdef1234567890
+        refreshToken:
+          type: string
+          example: ghijkl0987654321
+    CMSUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          required:
+            - cmsRole
+            - storeId
+          properties:
+            cmsRole:
+              $ref: "#/components/schemas/CmsRole"
+            storeId:
+              type: string
+              format: uuid
+              example: 123e4567-e89b-12d3-a456-426614174000
+
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: Account ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+    StoreId:
+      name: storeId
+      in: path
+      required: true
+      description: Store ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+
+  responses:
+    AuthResponse:
+      description: Successful login response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/User"
+              token:
+                $ref: "#/components/schemas/TokenAuth"
+    CMSAuthResponse:
+      description: Successful CMS login response
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/CMSUser"
+              token:
+                $ref: "#/components/schemas/TokenAuth"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

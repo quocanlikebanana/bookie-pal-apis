@@ -1,0 +1,402 @@
+openapi: "3.0.3"
+info:
+  title: API Title
+  version: "2.0"
+servers:
+  - url: https://api.server.test/v1
+security:
+  - BearerAuth: []
+
+paths:
+  /v2/register:
+    post:
+      summary: Register V2
+      description: Register a new user (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/login:
+    post:
+      summary: Login V2
+      description: Login to the system (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/google:
+    post:
+      summary: Google Login V2
+      description: Login to the system using Google OAuth (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Google OAuth token
+                redirectUrl:
+                  type: string
+                  description: Redirect URL used in the OAuth flow (optional, if not provided, it uses post message)
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse2"
+  /accounts/{accountId}:
+    get:
+      summary: Get User Info V2
+      description: Get user information by account ID (Version 2)
+      parameters:
+        - $ref: "#/components/parameters/AccountId"
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /accounts/many:
+    post:
+      summary: Get Multiple User Info V2
+      description: Get multiple user information by account IDs (Version 2)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accountIds
+              properties:
+                accountIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        "200":
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /v2/stores/{storeId}/login:
+    post:
+      summary: Store Login V2
+      description: Login to the system with store ID (Version 2)
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/CMSAuthResponse2"
+  /v2/stores/{storeId}/register/{inviteCode}:
+    post:
+      summary: Store Registration V2
+      description: Register a new user in the store after the invitation (Version 2)
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - name: inviteCode
+          in: path
+          required: true
+          description: Invitation code for the store
+          schema:
+            type: string
+            example: "INVITE1234"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+                timezone:
+                  type: string
+                  description: Timezone of the user. Only available for admin role registration via owner invitation. To create store data.
+      responses:
+        "201":
+          $ref: "#/components/responses/CMSAuthResponse2"
+  
+  /reset-password:
+    post:
+      summary: Reset Password V2
+      description: Reset user password using special reset code (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - newPassword
+              properties:
+                code:
+                  type: string
+                  description: Special reset code sent to the user's email
+                newPassword:
+                  type: string
+                  description: New password for the user
+      responses:
+        "201":
+          description: Password reset successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Password reset successfully"
+  /generate/reset-password:
+    post:
+      summary: Generate Reset Password Code 
+      description: Generate a special reset code and send it to the user's email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - redirectUrl
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email of the user to send the reset code
+                redirectUrl:
+                  type: string
+                  format: uri
+                  description: URL to redirect the user to the reset password page
+      responses:
+        "201":
+          description: Reset code generated and sent to email
+
+  /v2/customer/refresh:
+    post:
+      summary: Customer Refresh Token V2
+      description: Refresh the customer access token using the refresh token (Version 2)
+      security: []
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/cms/refresh:
+    post:
+      summary: CMS Refresh Token V2
+      description: Refresh the CMS access token using the refresh token (Version 2)
+      security: []
+      responses:
+        "200":
+          $ref: "#/components/responses/CMSAuthResponse2"
+
+components:
+  schemas:
+    Role:
+      type: number
+      enum:
+        - 1
+        - 2
+      description: Role of the user (1 - Client, 2 - CMS)
+    CmsRole:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+      description: CMS role of the user (1 - Admin, 2 - Manager, 3 - Employee)
+
+    User:
+      type: object
+      required:
+        - accountId
+        - role
+        - name
+        - phone
+        - email
+      properties:
+        accountId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name:
+          type: string
+          example: John Doe
+        role:
+          $ref: "#/components/schemas/Role"
+        phone:
+          type: string
+          example: +1234567890
+        email:
+          type: string
+          example: johndoe@gmail.com
+          format: email
+        address:
+          type: string
+          example: 123 Main St, City, Country
+        avatar:
+          type: string
+          example: https://example.com/avatar.jpg
+        isGoogle:
+          type: boolean
+          example: false
+          description: Indicates if the user registered via Google OAuth
+    TokenAuth:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          example: abcdef1234567890
+        refreshToken:
+          type: string
+          example: ghijkl0987654321
+    CMSUser:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          required:
+            - cmsRole
+            - storeId
+          properties:
+            cmsRole:
+              $ref: "#/components/schemas/CmsRole"
+            storeId:
+              type: string
+              format: uuid
+              example: 123e4567-e89b-12d3-a456-426614174000
+
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: Account ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+    StoreId:
+      name: storeId
+      in: path
+      required: true
+      description: Store ID of the user
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+
+  responses:
+    AuthResponse2:
+      description: Successful login response (Version 2)
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/User"
+    CMSAuthResponse2:
+      description: Successful CMS login response (Version 2)
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/CMSUser"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

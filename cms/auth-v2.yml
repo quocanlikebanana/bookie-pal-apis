@@ -1,17 +1,17 @@
 openapi: "3.0.3"
 info:
   title: API Title
-  version: "1.0"
+  version: "2.0"
 servers:
   - url: https://api.server.test/v1
 security:
   - BearerAuth: []
 
 paths:
-  /logout:
+  /v2/logout:
     post:
-      summary: Logout
-      description: Logout from the system (invalidate token in header)
+      summary: Logout (v2)
+      description: Logout from the system (invalidate HTTP-only cookies)
       responses:
         "200":
           description: Successful logout
@@ -25,7 +25,7 @@ paths:
                     example: "Logged out successfully"
   /accounts/{accountId}:
     put:
-      summary: Update User Info
+      summary: Update User Info (v2)
       description: Update user information by account ID
       parameters:
         - $ref: "#/components/parameters/AccountId"
@@ -57,7 +57,7 @@ paths:
                 $ref: "#/components/schemas/User"
   /stores/{storeId}/invite:
     post:
-      summary: Store Invite
+      summary: Store Invite (v2)
       description: Invite a user to the store
       parameters:
         - $ref: "#/components/parameters/StoreId"
@@ -83,13 +83,13 @@ paths:
                 redirectUrl:
                   type: string
                   format: uri
-                  description: URL to redirect after email confirmation
+                  description: URL to redirect in the email invitation
       responses:
         "201":
           description: User invited successfully
   /stores/{storeId}/accounts/{accountId}/avatar:
     put:
-      summary: Update Store User Avatar
+      summary: Update Store User Avatar (v2)
       description: Update the avatar of a user in a specific store
       parameters:
         - $ref: "#/components/parameters/StoreId"
@@ -110,6 +110,18 @@ paths:
         "200":
           description: Store user avatar updated successfully
 
+  /me:
+    get:
+      summary: Get Current User Info (v2)
+      description: Retrieve information about the currently authenticated user
+      responses:
+        "200":
+          description: Successful retrieval of current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  
 components:
   schemas:
     Role:

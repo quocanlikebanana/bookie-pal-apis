@@ -219,67 +219,140 @@ paths:
       responses:
         "201":
           $ref: "#/components/responses/CMSAuthResponse"
-  /stores/{storeId}/accounts:
-    get:
-      summary: Get Store accounts
-      description: Get accounts of a specific store
-      parameters:
-        - $ref: "#/components/parameters/StoreId"
-        - name: search
-          in: query
-          description: Search by name
-          required: false
-          schema:
-            type: string
-            example: John
-        - name: role
-          in: query
-          description: Filter by role (1 - Admin, 2 - Manager, 3 - Employee)
-          required: false
-          schema:
-            type: number
-            enum:
-              - 1
-              - 2
-              - 3
-            example: 1
-        - $ref: "./common.yml#/components/parameters/page"
-        - $ref: "./common.yml#/components/parameters/limit"
+  
+  /reset-password:
+    post:
+      summary: Reset Password
+      description: Reset user password using special reset code
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - newPassword
+              properties:
+                code:
+                  type: string
+                  description: Special reset code sent to the user's email
+                newPassword:
+                  type: string
+                  description: New password for the user
       responses:
-        "200":
-          description: Store users retrieved successfully
+        "201":
+          description: Password reset successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  pagination:
-                    $ref: "./common.yml#/components/schemas/Pagination"
-                  accounts:
-                    type: array
-                    description: List of store users information
-                    items:
-                      $ref: "#/components/schemas/CMSUser"
-  /stores/{storeId}/accounts/{accountId}:
+                  message:
+                    type: string
+                    example: "Password reset successfully"
+
+  # Version 2 endpoints: Uses HTTP only cookies for token management
+
+  /v2/register:
+    post:
+      summary: Register V2
+      description: Register a new user (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+      responses:
+        "201":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/login:
+    post:
+      summary: Login V2
+      description: Login to the system (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/google:
+    post:
+      summary: Google Login V2
+      description: Login to the system using Google OAuth (Version 2)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: Google OAuth token
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/refresh:
+    post:
+      summary: Refresh Token V2
+      description: Refresh the access token using the refresh token (Version 2)
+      security: []
+      responses:
+        "200":
+          $ref: "#/components/responses/AuthResponse2"
+  /v2/accounts/{accountId}:
     get:
-      summary: Get Store User Info
-      description: Get user information by account ID in a specific store
+      summary: Get User Info V2
+      description: Get user information by account ID (Version 2)
       parameters:
-        - $ref: "#/components/parameters/StoreId"
         - $ref: "#/components/parameters/AccountId"
       responses:
         "200":
-          description: Store user information retrieved successfully
+          description: User information retrieved successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CMSUser"
-  /stores/{storeId}/accounts/many:
+                $ref: "#/components/schemas/User"
+  /v2/accounts/many:
     post:
-      summary: Get Multiple Store User Info
-      description: Get multiple user information by account IDs in a specific store
-      parameters:
-        - $ref: "#/components/parameters/StoreId"
+      summary: Get Multiple User Info V2
+      description: Get multiple user information by account IDs (Version 2)
       requestBody:
         required: true
         content:
@@ -297,17 +370,87 @@ paths:
                     example: 123e4567-e89b-12d3-a456-426614174000
       responses:
         "200":
-          description: Store user information retrieved successfully
+          description: User information retrieved successfully
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CMSUser"
-  /reset-password:
+                  $ref: "#/components/schemas/User"
+
+  /v2/stores/{storeId}/login:
     post:
-      summary: Reset Password
-      description: Reset user password using special reset code
+      summary: Store Login V2
+      description: Login to the system with store ID (Version 2)
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/CMSAuthResponse"
+  /v2/stores/{storeId}/register/{inviteCode}:
+    post:
+      summary: Store Registration V2
+      description: Register a new user in the store after the invitation (Version 2)
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/StoreId"
+        - name: inviteCode
+          in: path
+          required: true
+          description: Invitation code for the store
+          schema:
+            type: string
+            example: "INVITE1234"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - name
+                - phone
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                name:
+                  type: string
+                phone:
+                  type: string
+                avatar:
+                  type: string
+                  description: User avatar image (File upload)
+                timezone:
+                  type: string
+                  description: Timezone of the user
+      responses:
+        "201":
+          $ref: "#/components/responses/CMSAuthResponse2"
+  
+  /v2/reset-password:
+    post:
+      summary: Reset Password V2
+      description: Reset user password using special reset code (Version 2)
       security: []
       requestBody:
         required: true
@@ -464,6 +607,31 @@ components:
                 $ref: "#/components/schemas/CMSUser"
               token:
                 $ref: "#/components/schemas/TokenAuth"
+
+    AuthResponse2:
+      description: Successful login response (Version 2)
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/User"
+    CMSAuthResponse2:
+      description: Successful CMS login response (Version 2)
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - user
+              - token
+            properties:
+              user:
+                $ref: "#/components/schemas/CMSUser"
 
   securitySchemes:
     BearerAuth:
