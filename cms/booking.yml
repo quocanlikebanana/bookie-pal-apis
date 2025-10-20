@@ -652,6 +652,20 @@ paths:
             default: 10
             minimum: 1
           description: "Radius in kilometers to search for nearby stores, default is 10 km."
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: "Latitude of the location"
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: "Longitude of the location"
       responses:
         "200":
           description: OK
