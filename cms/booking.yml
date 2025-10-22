@@ -654,14 +654,14 @@ paths:
           description: "Radius in kilometers to search for nearby stores, default is 10 km."
         - name: latitude
           in: query
-          required: true
+          required: false
           schema:
             type: number
             format: float
           description: "Latitude of the location"
         - name: longitude
           in: query
-          required: true
+          required: false
           schema:
             type: number
             format: float
@@ -855,6 +855,32 @@ paths:
 
   # Service
 
+  /v3/unauth/services/query/search:
+    get:
+      description: "Search services for a customer by name or description across all stores (no hidden services)"
+      tags:
+        - Service
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+        - $ref: "./common.yml#/components/parameters/search"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - services
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceView2"
   /v3/unauth/stores/{storeId}/services:
     get:
       description: "Get services of a store for a customer. Where only active services are returned. (no hidden services)"
