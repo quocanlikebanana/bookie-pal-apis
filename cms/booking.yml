@@ -881,6 +881,31 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/ServiceView2"
+  /v3/unauth/services/query/featured:
+    get:
+      description: "Get featured services for a customer across all stores (no hidden services). If user is not logged in, return random services."
+      tags:
+        - Service
+      parameters:
+        - $ref: "./common.yml#/components/parameters/page"
+        - $ref: "./common.yml#/components/parameters/limit"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - pagination
+                  - services
+                properties:
+                  pagination:
+                    $ref: "./common.yml#/components/schemas/Pagination"
+                  services:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ServiceView2"
   /v3/unauth/stores/{storeId}/services:
     get:
       description: "Get services of a store for a customer. Where only active services are returned. (no hidden services)"
