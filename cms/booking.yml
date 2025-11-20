@@ -196,7 +196,59 @@ paths:
       responses:
         "204":
           description: No Content
- 
+  /v3/cms/services/batch:
+    post:
+      description: Create a batch to fetch services by ids and then to be re-fetched at batch id.
+      tags:
+        - Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              properties:
+                ids:
+                  type: array
+                  items:
+                    $ref: "./common.yml#/components/schemas/Id"
+                  description: List of service ids to be fetched in batch.
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the batch.
+  /v3/cms/services/batch/{batchId}:
+    get:
+      description: Get services by batch id.
+      tags:
+        - Service
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the batch to fetch services.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceView2"
+  
   # Team
 
   /v3/cms/services/{serviceId}/teams:
@@ -381,6 +433,15 @@ paths:
         - $ref: "./common.yml#/components/parameters/limit"
         - $ref: "./common.yml#/components/parameters/search"
           description: "Search string for filtering, search by name or phone number of the profile"
+        - name: sortByBookings
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: "Sort profiles by number of bookings, can be asc or desc"
       responses:
         "200":
           description: OK
@@ -476,7 +537,87 @@ paths:
       responses:
         "204":
           description: No Content
-  
+  /v3/cms/profiles/{profileId}/note:
+    put:
+      description: "Update note of a profile by id"
+      tags:
+        - Profile
+      parameters:
+        - $ref: "#/components/parameters/profileId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - note
+              properties:
+                note:
+                  type: string
+                  description: Note of the profile
+                  example: "This customer prefers morning appointments."
+      responses:
+        "200":
+          description: OK    
+
+  # Mailer
+  /v3/cms/stores/{storeId}/sms-message:
+    post:
+      description: "Send SMS message to a customer for a store"
+      tags:
+        - CmsStoreMessage
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phones
+                - message
+              properties:
+                phones:
+                  type: array
+                  items:
+                    type: string
+                  description: "List of phone numbers to send the SMS to"
+                message:
+                  type: string
+                  example: "Your booking is confirmed."
+                  description: "Content of the SMS message"
+      responses:
+        "200":
+          description: OK
+  /v3/cms/stores/{storeId}/email-message:
+    post:
+      description: "Send email message to a customer for a store"
+      tags:
+        - CmsStoreMessage
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - emails
+                - message
+              properties:
+                emails:
+                  type: array
+                  items:
+                    type: string
+                  description: "List of email addresses to send the email to"
+                message:
+                  type: string
+                  example: "Your booking is confirmed."
+                  description: "Content of the email message"
+      responses:
+        "200":
+          description: OK
+
   # Store
   /v3/cms/stores/{storeId}:
     get:
@@ -682,7 +823,17 @@ paths:
                   stores:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Store2"
+                      type: object
+                      required:
+                        - store
+                        - distanceInKm
+                      properties:
+                        store:
+                          $ref: "#/components/schemas/Store2"
+                        distanceInKm:
+                          type: number
+                          format: float
+                          description: "Distance from the given location in kilometers"
   /v3/unauth/stores/query/suggested:
     get:
       description: "Get suggested stores for a customer."
@@ -702,6 +853,12 @@ paths:
               - recommended
             default: featured
           description: "Mode of suggested stores. (1) Featured: stores that is featured by the platform (promoted) or being viewed most (promotion + view count + ...). (2) New: newly created stores. (3) Recommended: stores that is recommended based on customer's preferences (if any), if user is not logged in, return random stores. Default is featured."
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Account ID of the customer (if any), used for personalized recommended stores"
       responses:
         "200":
           description: OK
@@ -883,12 +1040,18 @@ paths:
                       $ref: "#/components/schemas/ServiceView2"
   /v3/unauth/services/query/featured:
     get:
-      description: "Get featured services for a customer across all stores (no hidden services). If user is not logged in, return random services."
+      description: "Get featured services for a customer across all stores (no hidden services). If user is not logged in (userId is undefined), return random services."
       tags:
         - Service
       parameters:
         - $ref: "./common.yml#/components/parameters/page"
         - $ref: "./common.yml#/components/parameters/limit"
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Account ID of the customer (if any), used for personalized featured services"
       responses:
         "200":
           description: OK
@@ -1439,6 +1602,10 @@ components:
         avatar:
           type: string
           example: "https://example.com/avatar.jpg"
+        note:
+          type: string
+          description: Note of the customer
+          example: "This one is stupid"
     Profile:
       allOf:
         - $ref: "#/components/schemas/ProfileBase"
@@ -1458,6 +1625,25 @@ components:
                   type: integer
                   example: 10
                   description: Total number of bookings made by the customer
+            isAdminCreated:
+              type: boolean
+              example: false
+              description: Whether the profile was created by an admin user or by the customer themselves
+            groups:
+              type: array
+              items:
+                type: object
+                required:
+                  - id
+                  - title
+                properties:
+                  id:
+                    $ref: "./common.yml#/components/schemas/Id"
+                    description: Id of the group
+                  title:
+                    type: string
+                    example: "VIP Customers"
+                    description: Name of the group
     CreateProfile:
       allOf:
         - $ref: "#/components/schemas/ProfileBase"

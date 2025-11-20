@@ -1,0 +1,77 @@
+openapi: "3.0.3"
+info:
+  title: API Title
+  version: "2.0"
+servers:
+  - url: https://api.server.test/v1
+security:
+  - BearerAuth: []
+
+paths:
+  /{storeId}/config:
+    get:
+      summary: "Get mailer configuration for a store"
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      responses:
+        "200":
+          description: "Mailer configuration retrieved successfully"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MailerConfig"
+    post:
+      summary: "Create/Update mailer configuration for a store"
+      parameters:
+        - $ref: "#/components/parameters/storeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MailerConfig"
+      responses:
+        "200":
+          description: "Mailer configuration updated successfully"
+
+components:
+  schemas:
+    MailerConfig:
+      type: object
+      properties:
+        senderName:
+          type: string
+          example: "My Company"
+          description: Name of the email sender
+        titlePrefix:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldCode"
+          description: "List of field codes to prefix the email title, with orders as in the array"
+        emailSignature:
+          type: string
+          example: "Best regards,\nMy Company Team"
+          description: "Signature to be appended at the end of emails"
+
+    FieldCode:
+      type: string
+      description: "A code representing a specific field (with values to be replaced in email templates)"
+      enum:
+        - BusinessName
+        - DateTime
+  parameters:
+    storeId:
+      name: storeId
+      in: path
+      required: true
+      description: "ID of the store"
+      schema:
+        type: string
+        format: uuid
+        example: "123e4567-e89b-12d3-a456-426614174000"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

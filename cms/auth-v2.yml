@@ -122,6 +122,95 @@ paths:
               schema:
                 $ref: "#/components/schemas/User"
   
+  /v2/groups:
+    get:
+      summary: Get User Groups
+      description: Retrieve a list of user groups (Array)
+      responses:
+        "200":
+          description: Successful retrieval of user groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroupView"
+    post:
+      summary: Create User Group
+      description: Create a new user group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserGroupCreate"
+      responses:
+        "201":
+          description: User group created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  groupId:
+                    $ref: "./common.yml#/components/schemas/Id"
+  /v2/groups/{groupId}:
+    get:
+      summary: Get User Group by ID
+      description: Retrieve a user group by its ID
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: ID of the user group to retrieve
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "200":
+          description: Successful retrieval of user group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserGroupView"
+    put:
+      summary: Update User Group
+      description: Update an existing user group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: ID of the user group to update
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserGroupUpdate"
+      responses:
+        "200":
+          description: User group updated successfully
+    delete:
+      summary: Delete User Group
+      description: Delete a user group by its ID
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          description: ID of the user group to delete
+          schema:
+            type: string
+            format: uuid
+            example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "204":
+          description: User group deleted successfully
+
 components:
   schemas:
     Role:
@@ -199,6 +288,64 @@ components:
               type: string
               format: uuid
               example: 123e4567-e89b-12d3-a456-426614174000
+
+    UserGroupView:
+      type: object
+      required:
+        - groupId
+        - title
+        - createdAt
+        - updatedAt
+        - accountIds
+      properties:
+        groupId:
+          $ref: "./common.yml#/components/schemas/Id"
+        title:
+          type: string
+          example: "Administrators"
+        description:
+          type: string
+          example: "Group for admin users"
+        accountIds:
+          type: array
+          items:
+            $ref: "./common.yml#/components/schemas/Id"
+          description: List of account IDs in the group
+        createdAt:
+          $ref: "./common.yml#/components/schemas/DateTime"
+        updatedAt:
+          $ref: "./common.yml#/components/schemas/DateTime"
+    UserGroupCreate:
+      type: object
+      required:
+        - title
+        - accountIds
+      properties:
+        title:
+          type: string
+          example: "Administrators"
+        description:
+          type: string
+          example: "Group for admin users"
+        accountIds:
+          type: array
+          items:
+            $ref: "./common.yml#/components/schemas/Id"
+          description: List of account IDs in the group
+    UserGroupUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: "Administrators"
+        description:
+          type: string
+          example: "Group for admin users"
+        accountIds:
+          type: array
+          items:
+            $ref: "./common.yml#/components/schemas/Id"
+          description: List of account IDs in the group
 
   parameters:
     AccountId:
