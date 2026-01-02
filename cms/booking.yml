@@ -81,6 +81,53 @@ paths:
                     $ref: "./common.yml#/components/schemas/Id"
                     description: Id of the booking
                     example: "1234567890"
+  /v3/cms/books/{bookId}/confirm:
+    patch:
+      description: "Confirm a booking by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - accepted
+              properties:
+                accepted:
+                  type: boolean
+                  description: Whether to accept (status become ready) or reject (status become denied) the booking
+      responses:
+        "200":
+          description: OK
+  /v3/cms/books/{bookId}/done:
+    patch:
+      description: "Mark a booking as done by id"
+      tags:
+        - Book
+      parameters:
+        - $ref: "#/components/parameters/bookId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - points
+              properties:
+                points:
+                  type: integer
+                  description: Points earned from the booking (for loyalty program - coupons)
+                codes:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of coupon codes applied to the booking (the CMS can add codes for customer when marking booking as done)
+      responses:
+        "200":
+          description: OK
   /v3/cms/teams/{teamId}/books:
     get:
       description: "Get booked services of a team member in a store in time range"
@@ -989,23 +1036,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BookView2"
-  /v3/unauth/books/{bookId}/status:
+  /v3/unauth/books/{bookId}/cancel:
     patch:
-      description: "Update status of a booking by id"
+      description: "Cancel a booking by id for a customer"
       tags:
         - Book
       parameters:
         - $ref: "#/components/parameters/bookId"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - status
-              properties:
-                status:
-                  $ref: "#/components/schemas/BookingStatus"
       responses:
         "200":
           description: OK
@@ -1219,6 +1256,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/Availability"
 
+  /v3/unauth/teams/{teamId}/availability2:
+    get:
+      description: "Get availability of a team member in a store in time range (second version)"
+      tags:
+        - Team
+      parameters:
+        - $ref: "#/components/parameters/teamId"
+        - $ref: "#/components/parameters/start"
+        - $ref: "#/components/parameters/end"
+        - name: timezone
+          in: query
+          required: false
+          schema:
+            type: string
+          description: "Timezone of the time range, in IANA format (e.g. 'America/New_York'). If not provided, UTC is used."
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Availability2"
+
 components:
   schemas:
     Time:
@@ -1290,6 +1350,62 @@ components:
             end:
               hour: 18
               minute: 0
+    
+    Availability2:
+      description: Is an array of objects representing availability for specific dates. Each object contains a date and an array of available time ranges for that date.
+      type: array
+      items:
+        type: object
+        required:
+          - date
+          - timeRanges
+        properties:
+          date:
+            type: string
+            format: date
+            example: "2024-01-01"
+            description: Date in YYYY-MM-DD format.
+          timeRanges:
+            type: array
+            items:
+              $ref: "#/components/schemas/TimeRange"
+            description: Available time ranges on that date.
+      example:
+        - date: "2024-01-01"
+          timeRanges:
+            - start:
+                hour: 9
+                minute: 0
+              end:
+                hour: 18
+                minute: 0
+        - date: "2024-01-02"
+          timeRanges:
+            - start:
+                hour: 9
+                minute: 0
+              end:
+                hour: 12
+            - start:
+                hour: 13
+                minute: 0
+              end:
+                hour: 18
+                minute: 0
+        - date: "2024-01-03"
+          timeRanges:
+            - start:
+                hour: 9
+                minute: 0
+              end:
+                hour: 12
+            - start:
+                hour: 15
+                minute: 0
+              end:
+                hour: 18
+                minute: 0
+
     WorkHoursInWeek:
       type: array
       items:
@@ -1514,6 +1630,11 @@ components:
           format: uri
           example: "https://example.com/thank-you"
           description: Redirect URL after successful booking (for email notifications)
+        codes:
+          type: array
+          items:
+            type: string
+          description: Array of coupon codes applied to the booking
       required:
         - storeId
         - start

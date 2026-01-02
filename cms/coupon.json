@@ -373,6 +373,94 @@
         ]
       }
     },
+    "/coupon/secret-code": {
+      "post": {
+        "operationId": "Coupon_GetSecretCode",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/couponGetSecretCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Coupon"
+        ]
+      }
+    },
+    "/coupon/secret-code/add-points": {
+      "post": {
+        "operationId": "Coupon_AddSecretPoints",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/couponAddSecretPointsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Coupon"
+        ]
+      }
+    },
+    "/couponint/add-point": {
+      "post": {
+        "operationId": "CouponInternal_AddPoint",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/couponAddPointRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CouponInternal"
+        ]
+      }
+    },
     "/couponint/confirm-usage": {
       "post": {
         "operationId": "CouponInternal_ConfirmCouponUsage",
@@ -486,7 +574,7 @@
         "ok": {
           "type": "boolean"
         },
-        "statusCode": {
+        "status_code": {
           "type": "integer",
           "format": "int32"
         }
@@ -495,22 +583,52 @@
     "CreateMileStoneRequestMilestoneReward": {
       "type": "object",
       "properties": {
-        "couponValue": {
+        "coupon_value": {
           "type": "number",
           "format": "double"
         },
-        "expiredDuration": {
+        "expired_duration": {
           "type": "number",
           "format": "double"
         },
-        "currencyId": {
+        "currency_id": {
           "type": "string",
           "format": "uint64"
         },
-        "usageLimit": {
+        "usage_limit": {
           "type": "integer",
           "format": "int32",
           "title": "repeated uint64 service_ids = 5;"
+        }
+      }
+    },
+    "couponAddPointRequest": {
+      "type": "object",
+      "properties": {
+        "points": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "customer_id": {
+          "type": "string"
+        },
+        "store_id": {
+          "type": "string"
+        }
+      }
+    },
+    "couponAddSecretPointsRequest": {
+      "type": "object",
+      "properties": {
+        "secret_code": {
+          "type": "string"
+        },
+        "points": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "customer_id": {
+          "type": "string"
         }
       }
     },
@@ -523,10 +641,10 @@
             "type": "string"
           }
         },
-        "bookingId": {
+        "booking_id": {
           "type": "string"
         },
-        "customerId": {
+        "customer_id": {
           "type": "string"
         }
       }
@@ -534,7 +652,7 @@
     "couponCheckCouponsResponse": {
       "type": "object",
       "properties": {
-        "checkResult": {
+        "check_result": {
           "type": "array",
           "items": {
             "type": "object",
@@ -546,10 +664,10 @@
     "couponConfirmCouponUsageRequest": {
       "type": "object",
       "properties": {
-        "bookingId": {
+        "booking_id": {
           "type": "string"
         },
-        "storeId": {
+        "store_id": {
           "type": "string"
         },
         "codes": {
@@ -558,7 +676,7 @@
             "type": "string"
           }
         },
-        "customerId": {
+        "customer_id": {
           "type": "string"
         }
       }
@@ -590,21 +708,21 @@
           "type": "string",
           "format": "uint64"
         },
-        "bookingId": {
+        "booking_id": {
           "type": "string"
         },
-        "customerId": {
+        "customer_id": {
           "type": "string",
           "title": "repeated  string service_ids = 3;"
         },
         "status": {
           "$ref": "#/definitions/couponCouponUsedStatus"
         },
-        "reservedAt": {
+        "reserved_at": {
           "type": "string",
           "format": "date-time"
         },
-        "usedAt": {
+        "used_at": {
           "type": "string",
           "format": "date-time"
         }
@@ -622,23 +740,23 @@
     "couponCreateCouponRequest": {
       "type": "object",
       "properties": {
-        "expiredDuration": {
+        "expired_duration": {
           "type": "number",
           "format": "double"
         },
-        "customerId": {
+        "customer_id": {
           "type": "string"
         },
-        "currencyId": {
+        "currency_id": {
           "type": "string",
           "format": "uint64",
           "title": "repeated string service_ids = 3;"
         },
-        "usageLimit": {
+        "usage_limit": {
           "type": "integer",
           "format": "int32"
         },
-        "couponValue": {
+        "coupon_value": {
           "type": "number",
           "format": "double"
         }
@@ -722,10 +840,18 @@
         }
       }
     },
+    "couponGetSecretCodeResponse": {
+      "type": "object",
+      "properties": {
+        "secret_code": {
+          "type": "string"
+        }
+      }
+    },
     "couponListAppliedCouponRequest": {
       "type": "object",
       "properties": {
-        "bookingId": {
+        "booking_id": {
           "type": "string"
         }
       }
@@ -745,22 +871,22 @@
     "couponListCouponForCmsRequest": {
       "type": "object",
       "properties": {
-        "pageIndex": {
+        "page_index": {
           "type": "integer",
           "format": "int32"
         },
-        "pageSize": {
+        "page_size": {
           "type": "integer",
           "format": "int32"
         },
-        "sortMethods": {
+        "sort_methods": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/couponSortMethod"
           }
         },
-        "customerIds": {
+        "customer_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -770,7 +896,7 @@
           "$ref": "#/definitions/couponCouponStatus",
           "title": "repeated string service_ids = 5;"
         },
-        "searchContent": {
+        "search_content": {
           "type": "string"
         }
       }
@@ -785,11 +911,11 @@
             "$ref": "#/definitions/couponStoreCoupon"
           }
         },
-        "totalCount": {
+        "total_count": {
           "type": "integer",
           "format": "int32"
         },
-        "totalPages": {
+        "total_pages": {
           "type": "integer",
           "format": "int32"
         },
@@ -801,22 +927,22 @@
     "couponListCouponForCustomerRequest": {
       "type": "object",
       "properties": {
-        "pageIndex": {
+        "page_index": {
           "type": "integer",
           "format": "int32"
         },
-        "pageSize": {
+        "page_size": {
           "type": "integer",
           "format": "int32"
         },
-        "sortMethods": {
+        "sort_methods": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/couponSortMethod"
           }
         },
-        "storeId": {
+        "store_id": {
           "type": "array",
           "items": {
             "type": "string"
@@ -838,11 +964,11 @@
             "$ref": "#/definitions/couponStoreCoupon"
           }
         },
-        "totalCount": {
+        "total_count": {
           "type": "integer",
           "format": "int32"
         },
-        "totalPages": {
+        "total_pages": {
           "type": "integer",
           "format": "int32"
         },
@@ -854,18 +980,18 @@
     "couponListCurrencyRequest": {
       "type": "object",
       "properties": {
-        "searchContent": {
+        "search_content": {
           "type": "string"
         },
-        "pageIndex": {
+        "page_index": {
           "type": "integer",
           "format": "int32"
         },
-        "pageSize": {
+        "page_size": {
           "type": "integer",
           "format": "int32"
         },
-        "sortMethods": {
+        "sort_methods": {
           "type": "array",
           "items": {
             "type": "object",
@@ -884,11 +1010,11 @@
             "$ref": "#/definitions/couponCurrency"
           }
         },
-        "totalPage": {
+        "total_page": {
           "type": "integer",
           "format": "int32"
         },
-        "totalCount": {
+        "total_count": {
           "type": "integer",
           "format": "int32"
         },
@@ -900,22 +1026,22 @@
     "couponListMileStoneRequest": {
       "type": "object",
       "properties": {
-        "pageIndex": {
+        "page_index": {
           "type": "integer",
           "format": "int32"
         },
-        "pageSize": {
+        "page_size": {
           "type": "integer",
           "format": "int32"
         },
-        "sortMethods": {
+        "sort_methods": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/couponSortMethod"
           }
         },
-        "storeIds": {
+        "store_ids": {
           "type": "array",
           "items": {
             "type": "string"
@@ -933,11 +1059,11 @@
             "$ref": "#/definitions/couponMilestone"
           }
         },
-        "totalCount": {
+        "total_count": {
           "type": "integer",
           "format": "int32"
         },
-        "totalPages": {
+        "total_pages": {
           "type": "integer",
           "format": "int32"
         },
@@ -949,21 +1075,21 @@
     "couponListProgressRequest": {
       "type": "object",
       "properties": {
-        "storeIds": {
+        "store_ids": {
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "pageIndex": {
+        "page_index": {
           "type": "integer",
           "format": "int32"
         },
-        "pageSize": {
+        "page_size": {
           "type": "integer",
           "format": "int32"
         },
-        "sortMethods": {
+        "sort_methods": {
           "type": "array",
           "items": {
             "type": "object",
@@ -975,18 +1101,18 @@
     "couponListProgressResponse": {
       "type": "object",
       "properties": {
-        "progressList": {
+        "progress_list": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/couponProgress"
           }
         },
-        "totalPage": {
+        "total_page": {
           "type": "integer",
           "format": "int32"
         },
-        "totalCount": {
+        "total_count": {
           "type": "integer",
           "format": "int32"
         },
@@ -1013,7 +1139,7 @@
           "type": "integer",
           "format": "int32"
         },
-        "storeId": {
+        "store_id": {
           "type": "string"
         },
         "rewards": {
@@ -1022,6 +1148,9 @@
             "type": "object",
             "$ref": "#/definitions/couponReward"
           }
+        },
+        "name": {
+          "type": "string"
         }
       }
     },
@@ -1037,15 +1166,14 @@
     "couponProgress": {
       "type": "object",
       "properties": {
-        "milestoneId": {
-          "type": "string",
-          "format": "uint64"
+        "Milestone": {
+          "$ref": "#/definitions/couponMilestone"
         },
         "progress": {
           "type": "integer",
           "format": "int32"
         },
-        "passCount": {
+        "pass_count": {
           "type": "integer",
           "format": "int32"
         }
@@ -1060,14 +1188,14 @@
             "type": "string"
           }
         },
-        "bookingId": {
+        "booking_id": {
           "type": "string"
         },
-        "customerId": {
+        "customer_id": {
           "type": "string",
           "title": "repeated string service_ids = 3;"
         },
-        "storeId": {
+        "store_id": {
           "type": "string"
         }
       }
@@ -1079,27 +1207,27 @@
           "type": "string",
           "format": "uint64"
         },
-        "couponValue": {
+        "coupon_value": {
           "type": "number",
           "format": "double"
         },
-        "expiredDuration": {
+        "expired_duration": {
           "type": "number",
           "format": "double"
         },
-        "currencyId": {
+        "currency_id": {
           "type": "string",
           "format": "uint64"
         },
-        "usageLimit": {
+        "usage_limit": {
           "type": "integer",
           "format": "int32"
         },
-        "milestoneId": {
+        "milestone_id": {
           "type": "string",
           "format": "uint64"
         },
-        "couponType": {
+        "coupon_type": {
           "$ref": "#/definitions/couponCouponType",
           "title": "repeated uint64 service_ids = 8;"
         }
@@ -1135,47 +1263,47 @@
         "code": {
           "type": "string"
         },
-        "storeId": {
+        "store_id": {
           "type": "string"
         },
-        "expiredAt": {
+        "expired_at": {
           "type": "string",
           "format": "date-time"
         },
-        "customerId": {
+        "customer_id": {
           "type": "string"
         },
-        "currencyId": {
+        "currency_id": {
           "type": "string",
           "format": "uint64",
           "title": "repeated string service_ids = 6;"
         },
-        "couponType": {
+        "coupon_type": {
           "$ref": "#/definitions/couponCouponType"
         },
         "status": {
           "$ref": "#/definitions/couponCouponStatus"
         },
-        "usageLimit": {
+        "usage_limit": {
           "type": "integer",
           "format": "int32"
         },
-        "usedCount": {
+        "used_count": {
           "type": "integer",
           "format": "int32"
         },
-        "reservedCount": {
+        "reserved_count": {
           "type": "integer",
           "format": "int32"
         },
-        "couponUsages": {
+        "coupon_usages": {
           "type": "array",
           "items": {
             "type": "object",
             "$ref": "#/definitions/couponCouponUsage"
           }
         },
-        "couponValue": {
+        "coupon_value": {
           "type": "number",
           "format": "double"
         }
@@ -1184,10 +1312,10 @@
     "couponUnReserveCouponRequest": {
       "type": "object",
       "properties": {
-        "bookingId": {
+        "booking_id": {
           "type": "string"
         },
-        "storeId": {
+        "store_id": {
           "type": "string"
         }
       }
