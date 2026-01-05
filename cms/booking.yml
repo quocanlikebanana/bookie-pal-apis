@@ -1768,6 +1768,12 @@ components:
     CreateProfile:
       allOf:
         - $ref: "#/components/schemas/ProfileBase"
+        - type: object
+          properties:
+            groupIds:
+              type: array
+              items:
+                $ref: "./common.yml#/components/schemas/Id"
 
     CMSRole:
       type: number
