@@ -315,10 +315,14 @@ paths:
                     required:
                       - serviceId
                       - order
+                      - categoryId
                     properties:
                       serviceId:
                         $ref: "./common.yml#/components/schemas/Id"
                         description: Id of the service
+                      categoryId:
+                        $ref: "./common.yml#/components/schemas/Id"
+                        description: Id of the category the service belongs to
                       order:
                         type: integer
                         description: New order of the service
@@ -370,7 +374,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CategoryView"
+              $ref: "#/components/schemas/UpdateCategory"
       responses:
         "200":
           description: OK
