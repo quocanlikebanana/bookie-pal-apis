@@ -328,8 +328,10 @@ paths:
 
   # Category
 
-  /v3/cms/categories-all:
+  /v3/cms/stores/{storeId}/categories-all:
     get:
+      parameters:
+        - $ref: "#/components/parameters/storeId"
       description: "Get all service categories"
       tags:
         - Service
@@ -358,7 +360,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CategoryView"
     put:
-      description: "Update a service category by id"
+      description: "Update a service category by id (only name can be updated)"
       tags:
         - Service
         - Category
@@ -392,7 +394,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CategoryView"
+              $ref: "#/components/schemas/CreateCategory"
       responses:
         "201":
           description: Created
@@ -2045,11 +2047,18 @@ components:
             id:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the category
-    CategoryCreate:
+    CreateCategory:
       allOf:
         - $ref: "#/components/schemas/CategoryCore"
         - type: object
           description: Create category schema
+    UpdateCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Haircut"
+          description: Name of the category
 
     ServiceCore:
       type: object
@@ -2100,9 +2109,6 @@ components:
           description: Order of the service in the its category
           minimum: 0
           default: 0
-        category:
-          $ref: "#/components/schemas/CategoryView"
-          description: Category of the service
     CreateService:
       allOf:
         - $ref: "#/components/schemas/ServiceCore"
@@ -2110,6 +2116,9 @@ components:
           required:
             - memberIds
           properties:
+            categoryId:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the category the service belongs to
             memberIds:
               type: array
               items:
@@ -2131,6 +2140,9 @@ components:
               items:
                 $ref: "./common.yml#/components/schemas/Id"
               description: Ids of team members who can provide the service
+            category:
+              $ref: "#/components/schemas/CategoryView"
+              description: Category of the service
     ServiceBookView:
       allOf:
         - $ref: "#/components/schemas/ServiceCore"
