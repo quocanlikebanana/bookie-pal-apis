@@ -295,7 +295,139 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ServiceView2"
-  
+  /v3/cms/services/orders:
+    patch:
+      description: "Update orders of services"
+      tags:
+        - Service
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orders
+              properties:
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - serviceId
+                      - order
+                    properties:
+                      serviceId:
+                        $ref: "./common.yml#/components/schemas/Id"
+                        description: Id of the service
+                      order:
+                        type: integer
+                        description: New order of the service
+      responses:
+        "200":
+          description: OK
+
+  # Category
+
+  /v3/cms/categories-all:
+    get:
+      description: "Get all service categories"
+      tags:
+        - Service
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryView"
+  /v3/cms/categories/{categoryId}:
+    get:
+      description: "Get a service category by id"
+      tags:
+        - Service
+        - Category
+      parameters:
+        - $ref: "#/components/parameters/categoryId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryView"
+    put:
+      description: "Update a service category by id"
+      tags:
+        - Service
+        - Category
+      parameters:
+        - $ref: "#/components/parameters/categoryId"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryView"
+      responses:
+        "200":
+          description: OK
+    delete:
+      description: "Delete a service category by id"
+      tags:
+        - Service
+        - Category
+      parameters:
+        - $ref: "#/components/parameters/categoryId"
+      responses:
+        "204":
+          description: No Content
+  /v3/cms/categories:
+    post:
+      description: "Create a service category"
+      tags:
+        - Service
+        - Category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryView"
+      responses:
+        "201":
+          description: Created
+  /v3/cms/categories/orders:
+    patch:
+      description: "Update orders of service categories"
+      tags:
+        - Service
+        - Category
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orders
+              properties:
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - categoryId
+                      - order
+                    properties:
+                      categoryId:
+                        $ref: "./common.yml#/components/schemas/Id"
+                        description: Id of the category
+                      order:
+                        type: integer
+                        description: New order of the category
+      responses:
+        "200":
+          description: OK
+
   # Team
 
   /v3/cms/services/{serviceId}/teams:
@@ -465,6 +597,36 @@ paths:
       responses:
         "204":
           description: No Content
+  /v3/cms/teams/orders:
+    patch:
+      description: "Update orders of team members in a store"
+      tags:
+        - Team
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orders
+              properties:
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - teamId
+                      - order
+                    properties:
+                      teamId:
+                        $ref: "./common.yml#/components/schemas/Id"
+                        description: Id of the team member
+                      order:
+                        type: integer
+                        description: New order of the team member
+      responses:
+        "200":
+          description: OK
 
   # Profile
 
@@ -1768,6 +1930,16 @@ components:
     CreateProfile:
       allOf:
         - $ref: "#/components/schemas/ProfileBase"
+        - type: object
+          description: Create profile schema with additional fields.
+          required:
+            - groupIds 
+          properties:
+            groupIds:
+              type: array
+              items:
+                $ref: "./common.yml#/components/schemas/Id"
+              description: Array of group Ids to which the profile belongs
 
     CMSRole:
       type: number
@@ -1794,6 +1966,12 @@ components:
           $ref: "#/components/schemas/CMSRole"
         workHours:
           $ref: "#/components/schemas/WorkHoursInWeek"
+        order:
+          type: integer
+          example: 1
+          description: Order of the team member in the store
+          minimum: 0
+          default: 0
     Team:
       allOf:
         - $ref: "#/components/schemas/CreateTeam"
@@ -1810,6 +1988,7 @@ components:
               items:
                 $ref: "./common.yml#/components/schemas/Id"
               description: Array of service Ids that the team member can provide
+    
     CreateTimeOff:
       type: object
       required:
@@ -1837,6 +2016,41 @@ components:
               $ref: "./common.yml#/components/schemas/Id"
               description: Id of the team member
 
+    CategoryCore:
+      type: object
+      required:
+        - storeId
+        - name
+      properties:
+        storeId:
+          $ref: "./common.yml#/components/schemas/Id"
+          description: Id of the store
+        name:
+          type: string
+          example: "Haircut"
+          description: Name of the category
+        order:
+          type: integer
+          example: 1
+          description: Order of the category in the store
+          minimum: 0
+          default: 0
+    CategoryView:
+      allOf:
+        - $ref: "#/components/schemas/CategoryCore"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              $ref: "./common.yml#/components/schemas/Id"
+              description: Id of the category
+    CategoryCreate:
+      allOf:
+        - $ref: "#/components/schemas/CategoryCore"
+        - type: object
+          description: Create category schema
+
     ServiceCore:
       type: object
       required:
@@ -1861,10 +2075,6 @@ components:
           example: 30
           description: Duration of the service in minutes.
           minimum: 0
-        category:
-          type: string
-          example: "Hair"
-          description: Category of the service
         avatar:
           type: string
           description: Avatar of the service
@@ -1884,6 +2094,15 @@ components:
           description: Appearance color of the service in hex format, e.g. #FF5733
           pattern: "^#([0-9A-Fa-f]{6})$"
           default: "#000000"
+        order:
+          type: integer
+          example: 1
+          description: Order of the service in the its category
+          minimum: 0
+          default: 0
+        category:
+          $ref: "#/components/schemas/CategoryView"
+          description: Category of the service
     CreateService:
       allOf:
         - $ref: "#/components/schemas/ServiceCore"
@@ -1964,6 +2183,13 @@ components:
       in: path
       required: true
       description: "Id of the profile"
+      schema:
+        $ref: "./common.yml#/components/schemas/Id"
+    categoryId:
+      name: categoryId
+      in: path
+      required: true
+      description: "Id of the category"
       schema:
         $ref: "./common.yml#/components/schemas/Id"
 
