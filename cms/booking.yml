@@ -489,6 +489,15 @@ paths:
               - asc
               - desc
           description: "Sort profiles by number of bookings, can be asc or desc"
+        - name: sortByLastBooking
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: "Sort profiles by last booking date, can be asc or desc"
       responses:
         "200":
           description: OK
@@ -1746,6 +1755,9 @@ components:
                   type: integer
                   example: 10
                   description: Total number of bookings made by the customer
+                lastBooking:
+                  $ref: "./common.yml#/components/schemas/DateTime"
+                  description: DateTime of the last booking made by the customer
             isAdminCreated:
               type: boolean
               example: false
